@@ -5,10 +5,10 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "YoLinkLocal",
+            "name": "udi-YoLink",
             "type": "debugpy",
             "request": "launch",
-            "program": "udiYoLinkLocal.py",
+            "program": "udi-YoLink.py",
             "console": "integratedTerminal"
         }
     ]
