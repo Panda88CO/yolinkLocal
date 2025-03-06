@@ -180,12 +180,16 @@ class YoLinkSetup (udi_interface.Node):
             self.nbr_API_calls = self.Parameters['CALLS_PER_MIN']
             self.nbr_dev_API_calls = self.Parameters['DEV_CALLS_PER_MIN']
             self.yoAccess.set_api_limits(self.nbr_API_calls, self.nbr_dev_API_calls)
+        
+        # NEED TO DETERMINE IF LOCAL HUB EXISTS AND THEN GET LIST FROM THAT AS WELL 
+        
         self.deviceList = self.yoAccess.getDeviceList()
 
 
         logging.debug('{} devices detected : {}'.format(len(self.deviceList), self.deviceList) )
         if self.yoAccess:
             self.my_setDriver('ST', 1)
+
             self.addNodes(self.deviceList)
         else:
             self.my_setDriver('ST', 0)
@@ -215,7 +219,7 @@ class YoLinkSetup (udi_interface.Node):
                     logging.info('Hub not added - ISY cannot do anything useful with it')    
                     if  model in ['YS1606',]:
                         self.local_access = True
-                        self.yoAccess.getInitializeLocalAccess(self.client_id, self.client_secret, self.local_URL)
+                        self.yoAccess.initializeLocalAccess(self.client_id, self.client_secret, self.local_ip)
                         self.poly.Notices['local_access'] = 'Local Hub detected - Enabling local access'
 
 
@@ -656,7 +660,7 @@ class YoLinkSetup (udi_interface.Node):
             if 'LOCAL_IP' in  userParam:
                 self.local_ip = str(userParam['LOCAL_IP'])
                 self.local_ip = self.local_ip.strip()
-                self.local_URL = 'http://'+self.local_ip+self.local_port
+
 
             else:
                 self.poly.Notices['ck'] = 'Missing LOCAL_IP parameter'
