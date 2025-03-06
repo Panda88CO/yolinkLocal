@@ -77,7 +77,14 @@ class YoLinkSetup (udi_interface.Node):
         self.mqttURL = 'api.yosmart.com'
         self.mqttPort = 8003
         self.display_update_sec=60
-
+        self.uaid = ''
+        self.secretKey = ''
+        self.nbrTTS = None
+        self.client_id = None
+        self.client_secret = None
+        self.local_ip = 'x.x.x.x'
+        self.local_port = ':1080'
+        self.local_URL = ''
         
         logging.setLevel(10)
         logging.info(f'Version {version}')
@@ -195,6 +202,7 @@ class YoLinkSetup (udi_interface.Node):
                 nodename = str(dev['deviceId'][-14:])
                 address = self.poly.getValidAddress(nodename)
                 model = str(dev['modelName'][:6])
+                service_zone = dev['serviceZone']
                 #if address in self.Parameters:
                 #    name = self.Parameters[address]
                 #else:
@@ -205,12 +213,17 @@ class YoLinkSetup (udi_interface.Node):
                 logging.info('adding/checking device : {} - {}'.format(dev['name'], dev['type']))
                 if dev['type'] == 'Hub':     
                     logging.info('Hub not added - ISY cannot do anything useful with it')    
+                    if  model in ['YS1606',]:
+                        self.local_access = True
+                        self.yoAccess.getInitializeLocalAccess(self.client_id, self.client_secret, self.local_URL)
+                        self.poly.Notices['local_access'] = 'Local Hub detected - Enabling local access'
+
 
                 elif dev['type'] in ['SpeakerHub']:
 
                     logging.info('Adding device {} ({}) as {}'.format( dev['name'], dev['type'], str(name) ))                                        
                     temp = udiYoSpeakerHub(self.poly, address, address, name,  self.yoAccess, dev )                    
-                    self.msgList=[]
+                    #self.msgList=[]
                     logging.debug('Checking NBR_TTS')
                     if 'NBR_TTS' in self.Parameters:
                         self.nbrTTS = int(self.Parameters['NBR_TTS'])
@@ -624,7 +637,31 @@ class YoLinkSetup (udi_interface.Node):
                 self.nbr_API_calls = int(userParam['CALLS_PER_MIN'])
          
             if 'DEV_CALLS_PER_MIN' in userParam:
-                self.nbr_dev_API_calls = int(userParam['DEV_CALLS_PER_MIN'])   
+                self.nbr_dev_API_calls = int(userParam['DEV_CALLS_PER_MIN'])
+
+            # LOCAL ACCESS
+            if 'CLIENT_ID' in  userParam:
+                self.client_id = str(userParam['CLIENT_ID'])
+                self.client_id = self.client_id.strip()
+            else:
+                self.poly.Notices['ci'] = 'Missing CLIENT_ID parameter'
+                self.secretKey = ''
+            if 'CLIENT_SECRET' in  userParam:
+                self.client_secret = str(userParam['CLIENT_SECRET'])
+                self.client_secret = self.client_secret.strip()
+            else:
+                self.poly.Notices['ck'] = 'Missing CLIENT_SECRET parameter'
+                self.secretKey = ''
+
+            if 'LOCAL_IP' in  userParam:
+                self.local_ip = str(userParam['LOCAL_IP'])
+                self.local_ip = self.local_ip.strip()
+                self.local_URL = 'http://'+self.local_ip+self.local_port
+
+            else:
+                self.poly.Notices['ck'] = 'Missing LOCAL_IP parameter'
+                self.secretKey = 'x.x.x.x'
+
             
             nodes = self.poly.getNodes()
             #logging.debug('nodes: {}'.format(nodes))
