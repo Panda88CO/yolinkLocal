@@ -6,11 +6,11 @@ MIT License
 
 import sys
 import time
-from apscheduler.schedulers.background import BackgroundScheduler
+#from apscheduler.schedulers.background import BackgroundScheduler
 
 
 from yoLink_init_V3 import YoLinkInitPAC
-from yoLink_local_init_V3 import YoLinkInit_local
+from yoLink_local_init_V3 import YoLinkInitLocal
 from udiYoSwitchV2 import udiYoSwitch
 from udiYoSwitchSecV2 import udiYoSwitchSec
 from udiYoSwitchPwrSecV2 import udiYoSwitchPwrSec
@@ -84,7 +84,7 @@ class YoLinkSetup (udi_interface.Node):
         self.nbrTTS = None
         self.client_id = None
         self.client_secret = None
-        self.local_ip = 'x.x.x.x'
+        self.local_ip = ''
         self.local_port = ':1080'
         self.local_URL = ''
         
@@ -157,11 +157,13 @@ class YoLinkSetup (udi_interface.Node):
 
 
                        
-        if self.client_id in [None, ''] or self.client_secret  in [None, ''] or self.local_ip in [None, '']
+        if self.client_id in [None, ''] or self.client_secret  in [None, ''] or self.local_ip in [None, '']:
+            logging.error('ClientAcces, ClientSecret and localIPmust be provided to start node server')
+            self.poly.Notices['local_access'] = 'ClientAcces, ClientSecret and localIP must be specified in configuration'
             exit() 
             
         else:
-             self.yoLocal = self.yoAccess.initializeLocalAccess(self.client_id, self.client_secret, self.local_ip)
+             self.yoLocal = YoLinkInitLocal(self.client_id, self.client_secret, self.local_ip)
              if self.yoLocal:
                  self.local_access = True
 
