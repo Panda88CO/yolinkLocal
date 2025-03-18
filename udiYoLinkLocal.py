@@ -10,6 +10,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 
 
 from yoLink_init_V3 import YoLinkInitPAC
+from yoLink_local_init_V3 import YoLinkInit_local
 from udiYoSwitchV2 import udiYoSwitch
 from udiYoSwitchSecV2 import udiYoSwitchSec
 from udiYoSwitchPwrSecV2 import udiYoSwitchPwrSec
@@ -66,6 +67,7 @@ class YoLinkSetup (udi_interface.Node):
         self.address = address
         self.name = name
         self.yoAccess = None
+        self.yoLocal = None
         self.TTSstr = 'TTS'
         self.nbr_API_calls = 19
         self.nbr_dev_API_calls = 5
@@ -152,10 +154,20 @@ class YoLinkSetup (udi_interface.Node):
         #self.supportedYoTypes = ['Dimmer']
         #self.supportedYoTypes = [ 'WaterDepthSensor', 'VibrationSensor']    
         self.updateEpochTime()
+
+
+                       
+        if self.client_id in [None, ''] or self.client_secret  in [None, ''] or self.local_ip in [None, '']
+            exit() 
+            
+        else:
+             self.yoLocal = self.yoAccess.initializeLocalAccess(self.client_id, self.client_secret, self.local_ip)
+             if self.yoLocal:
+                 self.local_access = True
+
         if self.uaid == None or self.uaid == '' or self.secretKey==None or self.secretKey=='':
             logging.error('UAID and secretKey must be provided to start node server')
             exit() 
-
 
         self.yoAccess = YoLinkInitPAC (self.uaid, self.secretKey)
         if self.yoAccess:
