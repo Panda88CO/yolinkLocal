@@ -69,7 +69,7 @@ class YoLinkInitLocal(object):
         self.local_client_id = client_id
         self.local_client_secret = client_secret
         self.local_ip = local_ip
-
+        self.local_token = None
                 
         #self.timeExpMarging = 7170 #min for testing 
         self.tmpData = {}
@@ -89,7 +89,9 @@ class YoLinkInitLocal(object):
         self.unassigned_nodes = []
 
         self.initializeLocalAccess(self.local_client_id, self.local_client_secret, self.local_ip)
-
+        self.refreshLocalAccess()
+        self.get_local_device_list()
+        logging.debug(f'Local device list {self.deviceList}')
         '''
         try:
             #while not self.request_new_token( ):
@@ -220,6 +222,21 @@ class YoLinkInitLocal(object):
             logging.debug('Exeption occcured during refresh_token : {}'.format(e))
             #return(self.request_new_token())
 
+    def get_local_device_list(self):
+        try:
+            logging.debug('retrieve_device_list')
+            data= {}
+            data['method'] = 'Home.getDeviceList'
+            data['time'] = str(int(time.time_ns()/1e6))
+            headers1 = {}
+            headers1['Content-type'] = 'application/json'
+            headers1['Authorization'] = 'Bearer '+ self.local_token['access_token']
+            r = requests.post(self.local_URL, data=json.dumps(data), headers=headers1, timeout=5) 
+            info = r.json()
+            self.deviceList = info['data']['devices']
+            logging.debug('yoAccess.deviceList : {}'.format(self.deviceList))
+        except Exception as e:
+            logging.error(f'Exception  -  retrieve_device_list : {e}')             
 
 
     #######################################
