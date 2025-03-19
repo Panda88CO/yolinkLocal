@@ -231,7 +231,7 @@ class YoLinkInitLocal(object):
             headers1 = {}
             headers1['Content-type'] = 'application/json'
             headers1['Authorization'] = 'Bearer '+ self.local_token['access_token']
-            r = requests.post(self.local_URL, data=json.dumps(data), headers=headers1, timeout=5) 
+            r = requests.post(self.local_URL+'/open/yolink/v2/api', data=json.dumps(data), headers=headers1, timeout=5) 
             info = r.json()
             self.deviceList = info['data']['devices']
             logging.debug('yoAccess.deviceList : {}'.format(self.deviceList))
