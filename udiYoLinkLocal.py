@@ -151,7 +151,7 @@ class YoLinkSetup (udi_interface.Node):
                                 'PowerFailureAlarm', 'SmartRemoter', 'COSmokeSensor', 'Siren', 'WaterMeterController',
                                 'WaterDepthSensor']
         
-        #self.supportedYoTypes = ['Dimmer']
+        self.supportedYoTypes = ['Switch','VibrationSensor']
         #self.supportedYoTypes = [ 'WaterDepthSensor', 'VibrationSensor']    
         self.updateEpochTime()
 
@@ -165,8 +165,15 @@ class YoLinkSetup (udi_interface.Node):
         else:
              self.yoLocal = YoLinkInitLocal(self.client_id, self.client_secret, self.local_ip)
              if self.yoLocal:
-                 self.local_access = True
+                self.local_access = True
+                self.deviceList = self.yoLocal.retrieve_device_list()
+                self.addNodes(self.deviceList )
 
+        
+        
+        
+        
+        exit()
         if self.uaid == None or self.uaid == '' or self.secretKey==None or self.secretKey=='':
             logging.error('UAID and secretKey must be provided to start node server')
             exit() 
@@ -220,7 +227,7 @@ class YoLinkSetup (udi_interface.Node):
                 nodename = str(dev['deviceId'][-14:])
                 address = self.poly.getValidAddress(nodename)
                 model = str(dev['modelName'][:6])
-                service_zone = dev['serviceZone']
+                #service_zone = dev['serviceZone']
                 #if address in self.Parameters:
                 #    name = self.Parameters[address]
                 #else:
@@ -275,6 +282,7 @@ class YoLinkSetup (udi_interface.Node):
                         self.assigned_addresses.append(adr)  
 
                 elif dev['type'] in ['Switch']:
+                    model = None
                     if  model in ['YS5708', 'YS5709']:
                         logging.info('Adding swithSec device {} ({}) as {}'.format( dev['name'], dev['type'], str(name) ))                                        
                         temp = udiYoSwitchSec(self.poly, address, address, name,  self.yoAccess, dev )
@@ -283,7 +291,7 @@ class YoLinkSetup (udi_interface.Node):
                         temp = udiYoSwitchPwrSec(self.poly, address, address, name,  self.yoAccess, dev )
                     else:
                         logging.info('Adding switch device {} ({}) as {}'.format( dev['name'], dev['type'], str(name) ))                                        
-                        temp = udiYoSwitch(self.poly, address, address, name,  self.yoAccess, dev )
+                        temp = udiYoSwitch(self.poly, address, address, name,  self.yoLocal, dev )
                     while not temp.node_ready:
                         logging.debug( 'Waiting for node {}-{} to be ready'.format(dev['type'] , dev['name']))
                         time.sleep(4)
@@ -346,7 +354,7 @@ class YoLinkSetup (udi_interface.Node):
 
                 elif dev['type'] in  ['VibrationSensor']:                    
                     logging.info('Adding device {} ({}) as {}'.format( dev['name'], dev['type'], str(name) ))                                        
-                    temp = udiYoVibrationSensor(self.poly, address, address, name, self.yoAccess, dev )
+                    temp = udiYoVibrationSensor(self.poly, address, address, name, self.yoLocal, dev )
                     while not temp.node_ready:
                         logging.debug( 'Waiting for node {}-{} to be ready'.format(dev['type'] , dev['name']))
                         time.sleep(4)

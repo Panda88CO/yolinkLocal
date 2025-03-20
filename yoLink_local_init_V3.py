@@ -387,11 +387,13 @@ class YoLinkInitLocal(object):
             headers1['Authorization'] = 'Bearer '+ self.local_token['access_token']
             r = requests.post(self.local_URL, data=json.dumps(data), headers=headers1, timeout=5) 
             info = r.json()
-            self.deviceList = info['data']['devices']
-            logging.debug('self.deviceList : {}'.format(self.deviceList))
+            deviceList = info['data']['devices']
+            logging.debug(f'self.deviceList : {deviceList}')
+            return (deviceList)
+
         except Exception as e:
             logging.error('Exception  -  retrieve_device_list : {}'.format(e))             
-
+            return (None)
     #@measure_time
     def retrieve_homeID(self):
         try:
