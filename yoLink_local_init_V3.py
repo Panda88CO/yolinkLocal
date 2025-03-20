@@ -92,6 +92,8 @@ class YoLinkInitLocal(object):
         self.refreshLocalAccess()
         self.get_local_device_list()
         logging.debug(f'Local device list {self.deviceList}')
+
+
         '''
         try:
             #while not self.request_new_token( ):
@@ -411,6 +413,51 @@ class YoLinkInitLocal(object):
         except Exception as e:
             logging.error('Exception  - retrieve_homeID: {}'.format(e))    
 
+    def setState(self, state):
+        logging.debug(self.type+' - setState')
+        #if 'setState'  in self.methodList:          
+        #    if state.lower() not in self.stateList:
+        #        logging.error('Unknows state passed')
+        #        return(False)
+        if state.lower() == 'on':
+            state = 'open'
+        if state.lower() == 'off':
+            state = 'closed'
+        data = {}
+        data['params'] = {}
+        data['params']['state'] = state.lower()
+        self.type = 'Switch'
+        return(self.setDevice( data))
+        #else:
+        #    return(False)
+   
+    def setDevice(self,  data):
+        logging.debug(self.type+' - setDevice')
+        worked = False
+        #if 'setState' in self.methodList:
+        methodStr = self.type+'.setState'
+        #    worked = True
+        #elif 'toggle' in self.methodList:
+        #    methodStr = self.type+'.toggle'
+        #    worked = True
+        #elif 'setAttributes' in self.methodList:
+        #    methodStr = self.type+'.setAttributes'
+        #    worked = True               
+        #data['time'] = str(int(time.time_ns()//1e6))# we assign time just before publish
+        data['method'] = methodStr
+        data["targetDevice"] =  'd88b4c0100092ca9'
+        data["token"]= self.deviceInfo['token']
+        logging.debug(self.type+' - setDevice -data {}'.format(data))
+        if worked:
+            self.yoAccess.publish_data(data)
+            #while  not self.yoAccess.publish_data( data) and attempt <= maxAttempts:
+            #    time.sleep(10.1) # we can only try 6 timer per minute per device 
+            #    attempt = attempt + 1
+            #self.yoAccess.publish_data(data)
+            return(True)
+        else:
+            return(False)
+   
     #@measure_time
     #def getDeviceList (self):
     #    return(self.deviceList)
