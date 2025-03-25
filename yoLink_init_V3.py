@@ -120,10 +120,10 @@ class YoLinkInitPAC(object):
                     self.retrieve_homeID()
                     self.mqtt_str = 'yl-home/'
                     self.retrieve_device_list()
-            else:
-                if self.token != None:
-                    self.retrieve_homeID()
-                    self.mqtt_str = 'ylsubnet/'
+                else:
+                    if self.token != None:
+                        self.retrieve_homeID()
+                        self.mqtt_str = 'ylsubnet/'
                     
 
             #if self.client == None:    

@@ -169,7 +169,7 @@ class YoLinkSetup (udi_interface.Node):
                 exit() 
             else:
                 tokenURL = self.local_URL+'/open/yolink/token'
-                self.yoLocal = YoLinkInitPAC (self.client_id, self.client_secret, tokenURL, self.local_URL, self.local_ip, self.local_MQTT_port  )
+                self.yoLocal = YoLinkInitPAC (self.client_id, self.client_secret, tokenURL, self.local_URL, self.local_ip, self.local_MQTT_port, self.subnet_id  )
    
 
                        
