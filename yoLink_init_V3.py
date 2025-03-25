@@ -66,7 +66,7 @@ class YoLinkInitPAC(object):
         self.lastTransferTime = int(time.time())
 
         self.local_URL = ''
-        self.local_port = ':1080'
+        #self.local_port = ':1080'
         self.local_client_id = None
         self.local_client_secret = None
                 
@@ -80,7 +80,7 @@ class YoLinkInitPAC(object):
         self.online = False
         self.deviceList = []
         self.token = None
-        
+        self.mqtt_str = ''
         self.QoS = 1
         self.keepAlive = 60
 
@@ -122,9 +122,10 @@ class YoLinkInitPAC(object):
                     self.retrieve_device_list()
                 else:
                     if self.token != None:
-                        self.retrieve_homeID()
-                        self.mqtt_str = 'ylsubnet/'
-                    
+                       self.mqtt_str = 'ylsubnet/'
+            else:
+                self.mmode = 'local'
+                self.mqtt_str = 'ylsubnet/'    
 
             #if self.client == None:    
       
@@ -484,7 +485,11 @@ class YoLinkInitPAC(object):
             #self.retrieve_homeID()
             time.sleep(1)
             logging.debug(f'info: {self.mqttURL} {self.mqttPort} {self.keepAlive}{self.token}')
-            self.client.username_pw_set(username=self.token['access_token'], password=None)
+            if self.mode == 'cloud': 
+                self.client.username_pw_set(username=self.token['access_token'], password=None)
+            elif self.mode == 'local':
+                self.client.username_pw_set(username=self.local_client_id, password=self.token['access_token'])
+                
             logging.debug('self.client.connect: {}'.format(self.client.connect(self.mqttURL, self.mqttPort, keepalive= self.keepAlive))) # ping server every 30 sec
                 
             self.client.loop_start()
