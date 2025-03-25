@@ -140,7 +140,7 @@ class YoLinkSetup (udi_interface.Node):
         logging.info('Executing start - udi-YoLink')
         logging.info ('Access using PAC/UAC')
         #logging.setLevel(30)
-        while not self.nodeDefineDone:
+        while not self.nodeDefineDone and self.handleParamsDone:
             time.sleep(1)
             logging.debug ('waiting for inital node to get created')
 
@@ -154,6 +154,7 @@ class YoLinkSetup (udi_interface.Node):
         self.supportedLocalYoTypes = self.supportedYoTypes 
         #self.supportedYoTypes = [ 'WaterDepthSensor', 'VibrationSensor']    
         self.updateEpochTime()
+
         if self.access_mode in ['cloud', 'hybrid']:
             if self.uaid == None or self.uaid == '' or self.secretKey==None or self.secretKey=='':
                 logging.error('UAID and secretKey must be provided to start node server')
