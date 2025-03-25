@@ -73,6 +73,8 @@ class YoLinkSetup (udi_interface.Node):
         self.tokenURL = 'https://api.yosmart.com/open/yolink/token'
         self.mqttURL = 'api.yosmart.com'
         self.mqttPort = 8003
+
+        self.local_mqttPort = 18080
         self.display_update_sec=60
 
         
@@ -132,7 +134,7 @@ class YoLinkSetup (udi_interface.Node):
         while not self.nodeDefineDone:
             time.sleep(1)
             logging.debug ('waiting for inital node to get created')
-
+        
         self.supportedYoTypes = ['Switch', 'THSensor', 'MultiOutlet', 'DoorSensor','Manipulator', 
                                 'MotionSensor', 'Outlet', 'GarageDoor', 'LeakSensor', 'Hub', 
                                 'SpeakerHub', 'VibrationSensor', 'Finger', 'Lock' , 'LockV2', 'Dimmer', 'InfraredRemoter',
@@ -142,12 +144,13 @@ class YoLinkSetup (udi_interface.Node):
         #self.supportedYoTypes = ['Lock' , 'LockV2', 'Switch']
         #self.supportedYoTypes = [ 'WaterDepthSensor', 'VibrationSensor']    
         self.updateEpochTime()
+
         if self.uaid == None or self.uaid == '' or self.secretKey==None or self.secretKey=='':
             logging.error('UAID and secretKey must be provided to start node server')
+            self.poly.Notices['cloud'] = 'UAID and secretKey must be provided to start node server in cloud or hybrid mode'
             exit() 
-
-
-        self.yoAccess = YoLinkInitPAC (self.uaid, self.secretKey)
+        self.yoAccess = YoLinkInitPAC (self.uaid, self.secretKey )
+           
         if self.yoAccess:
             self.my_setDriver('ST', 0)
         if 'TEMP_UNIT' in self.Parameters:
@@ -618,7 +621,28 @@ class YoLinkSetup (udi_interface.Node):
                 self.nbr_API_calls = int(userParam['CALLS_PER_MIN'])
          
             if 'DEV_CALLS_PER_MIN' in userParam:
-                self.nbr_dev_API_calls = int(userParam['DEV_CALLS_PER_MIN'])   
+                self.nbr_dev_API_calls = int(userParam['DEV_CALLS_PER_MIN'])
+
+            if 'MODE'in userParam:
+                mode = userParam['MODE']
+                if mode in ['local', 'cloud', 'hybrid']:
+                    self.access_mode = mode
+
+            if 'LOCAL_CLIENT_ID' in userParam:
+                self.client_id = userParam['LOCAL_CLIENT_ID']
+            else:
+                self.client_id = None
+        
+            if 'LOCAL_CLIENT_SECRET' in userParam:
+                self.client_secret = userParam['LOCAL_CLIENT_SECRET']
+            else:
+                self.client_secret = None
+
+            if 'SUBNET_ID' in userParam:
+                self.client_secret = userParam['SUBNET_ID']
+            else:
+                self.client_secret = None
+
             
             nodes = self.poly.getNodes()
             #logging.debug('nodes: {}'.format(nodes))
