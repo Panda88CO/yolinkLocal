@@ -46,13 +46,12 @@ class udiYoSwitch(udi_interface.Node):
         ]
 
 
-    def  __init__(self, polyglot, primary, address, name, yoAccess, yoLocal, deviceInfo):
+    def  __init__(self, polyglot, primary, address, name, yoAccess, deviceInfo):
         super().__init__( polyglot, primary, address, name)   
         logging.debug('udiYoSwitch2Button INIT- {}'.format(deviceInfo['name']))
         self.poly = polyglot
         self.devInfo =  deviceInfo   
         self.yoAccess = yoAccess
-        self.yoLocal = yoLocal
         self.address = address
         self.name = name
         self.yoSwitch = None

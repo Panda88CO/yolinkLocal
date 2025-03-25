@@ -301,7 +301,8 @@ class YoLinkSetup (udi_interface.Node):
                         logging.debug('Cloud Access selected {}'.format(dev['modelName']))
                         dev_access = self.yoAccess     
                 else: # local devices only              
-
+                    logging.debug('Local Access selected {}'.format(dev['modelName']))
+                    dev_access = self.yoLocal
                 #if address in self.Parameters:
                 #    name = self.Parameters[address]
                 #else:
