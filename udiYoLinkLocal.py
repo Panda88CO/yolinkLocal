@@ -598,10 +598,10 @@ class YoLinkSetup (udi_interface.Node):
     def heartbeat(self):
         logging.debug('heartbeat: ' + str(self.hb))
         connected = False
-        if self.access_mode in ['hybrid', 'online']
+        if self.access_mode in ['hybrid', 'online']:
             if self.yoAccess.online:
                 connected = True
-        if self.access_mode in ['hybrid', 'local']
+        if self.access_mode in ['hybrid', 'local']:
             if self.yoLocal.online:
                 connected = True
         if connected:
