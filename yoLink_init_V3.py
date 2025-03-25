@@ -67,8 +67,8 @@ class YoLinkInitPAC(object):
 
         self.local_URL = ''
         #self.local_port = ':1080'
-        self.local_client_id = None
-        self.local_client_secret = None
+        self.local_client_id = uaID
+        self.local_client_secret = secID
                 
         #self.timeExpMarging = 7170 #min for testing 
         self.tmpData = {}
