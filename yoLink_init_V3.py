@@ -483,6 +483,7 @@ class YoLinkInitPAC(object):
             #self.retrieve_device_list()
             #self.retrieve_homeID()
             time.sleep(1)
+            logging.debug(f'info: {self.mqttURL} {self.mqttPort} {self.keepAlive}{self.token}')
             self.client.username_pw_set(username=self.token['access_token'], password=None)
             logging.debug('self.client.connect: {}'.format(self.client.connect(self.mqttURL, self.mqttPort, keepalive= self.keepAlive))) # ping server every 30 sec
                 
