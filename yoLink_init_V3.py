@@ -486,9 +486,11 @@ class YoLinkInitPAC(object):
             time.sleep(1)
             logging.debug(f'info: {self.mqttURL} {self.mqttPort} {self.keepAlive}{self.token}')
             if self.mode == 'cloud': 
+                logging.debug(f'cloud ; {self.token['access_token']} {self.mode}')
                 self.client.username_pw_set(username=self.token['access_token'], password=None)
             elif self.mode == 'local':
-                self.client.username_pw_set(username=self.local_client_id, password=self.token['access_token'])
+                logging.debug(f'local ; {self.local_client_id} {self.local_client_secret}')
+                self.client.username_pw_set(username=self.local_client_id, password=self.local_client_secret)
 
             logging.debug('self.client.connect: {}'.format(self.client.connect(self.mqttURL, self.mqttPort, keepalive= self.keepAlive))) # ping server every 30 sec
                 
