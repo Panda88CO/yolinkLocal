@@ -33,7 +33,7 @@ DEBUG = False
 
 
 class YoLinkInitPAC(object):
-    def __init__(self, uaID, secID, tokenURL='https://api.yosmart.com/open/yolink/token' , apiURL='https://api.yosmart.com/open/yolink/v2/api', mqttURL= 'api.yosmart.com', mqttPort = 8003, home_id = None):
+    def __init__(self, ID, secret, tokenURL='https://api.yosmart.com/open/yolink/token' , apiURL='https://api.yosmart.com/open/yolink/v2/api', mqttURL= 'api.yosmart.com', mqttPort = 8003, home_id = None):
         self.homeID  = home_id
         self.disconnect_occured = False 
         self.tokenLock = Lock()
@@ -58,8 +58,8 @@ class YoLinkInitPAC(object):
 
         self.connectedToBroker = False
         self.loopRunning = False
-        self.uaID = uaID
-        self.secID = secID
+        self.uaID = ID
+        self.secID = secret
         self.apiType = 'UAC'
         self.tokenExpTime = 0
         self.timeExpMarging = 3600 # 1 hour - most devices report once per hour
@@ -67,9 +67,9 @@ class YoLinkInitPAC(object):
 
         self.local_URL = ''
         #self.local_port = ':1080'
-        self.local_client_id = uaID
-        self.local_client_secret = secID
-                
+        self.local_client_id = ID
+        self.local_client_secret = secret
+                        
         #self.timeExpMarging = 7170 #min for testing 
         self.tmpData = {}
         self.lastDataPacket = {}
