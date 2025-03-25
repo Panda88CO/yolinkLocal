@@ -491,10 +491,10 @@ class YoLinkInitPAC(object):
             elif self.mode == 'local':
                 logging.debug(f'local ; {self.local_client_id} {self.local_client_secret}')
                 self.client.username_pw_set(username=self.local_client_id, password=self.local_client_secret)
-                
+
             logging.debug(f'info: {self.mqttURL} {self.mqttPort} {self.keepAlive} {self.token}')
-            logging.debug('self.client.connect: {}'.format(self.client.connect(self.mqttURL, self.mqttPort, keepalive= self.keepAlive))) # ping server every 30 sec
-                
+            temp = self.client.connect(self.mqttURL, self.mqttPort, keepalive= self.keepAlive)
+            logging.debug(f'self.client.connect: {temp}' )               
             self.client.loop_start()
             time.sleep(2)
             self.connectedToBroker = True   
