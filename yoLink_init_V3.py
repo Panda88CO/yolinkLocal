@@ -486,7 +486,7 @@ class YoLinkInitPAC(object):
             time.sleep(1)
             logging.debug(f'info: {self.mqttURL} {self.mqttPort} {self.keepAlive}{self.token}')
             if self.mode == 'cloud': 
-                logging.debug(f'cloud ; {self.token['access_token']} {self.mode}')
+                logging.debug('cloud : {}'.format(self.token['access_token']))
                 self.client.username_pw_set(username=self.token['access_token'], password=None)
             elif self.mode == 'local':
                 logging.debug(f'local ; {self.local_client_id} {self.local_client_secret}')
