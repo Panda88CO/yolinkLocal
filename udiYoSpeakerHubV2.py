@@ -48,11 +48,12 @@ class udiYoSpeakerHub(udi_interface.Node):
     ''' 
    
 
-    def  __init__(self, polyglot, primary, address, name, yoAccess, deviceInfo):
+    def  __init__(self, polyglot, primary, address, name, yoAccess, yoLocal, deviceInfo):
         super().__init__( polyglot, primary, address, name)   
         logging.debug('udiYoSpeakerHub INIT- {}'.format(deviceInfo['name']))
         self.devInfo =  deviceInfo   
         self.yoAccess = yoAccess
+        self.yoLocal = yoLocal
         self.yoSpeakerHub = None
         self.node_ready = False
         self.n_queue = []
