@@ -67,10 +67,8 @@ class YoLinkSetup (udi_interface.Node):
         self.debug = False
         self.address = address
         self.name = name
-        #self.yoAccess = {}
-        self.yoAccess.online = False
-        #self.yoLocal = None
-        self.yoLocal.online = False
+        self.yoAccess = None
+        self.yoLocal = None
         self.TTSstr = 'TTS'
         self.nbr_API_calls = 19
         self.nbr_dev_API_calls = 5
@@ -198,7 +196,7 @@ class YoLinkSetup (udi_interface.Node):
         #    exit() 
 
         #self.yoAccess = YoLinkInitPAC (self.uaid, self.secretKey)
-        if self.yoAccess.online or self.yoLocal.online:
+        if self.yoAccess or self.yoLocal:
             self.my_setDriver('ST', 0)
         if 'TEMP_UNIT' in self.Parameters:
             self.temp_unit = self.convert_temp_unit(self.Parameters['TEMP_UNIT'])
@@ -239,7 +237,7 @@ class YoLinkSetup (udi_interface.Node):
 
 
         logging.debug('{} devices detected : {}'.format(len(self.deviceList), self.deviceList) )
-        if self.yoAccess.online or self.yoLocal.online:
+        if self.yoAccess or self.yoLocal:
             self.my_setDriver('ST', 1)
 
             self.addNodes(self.deviceList)
@@ -599,7 +597,14 @@ class YoLinkSetup (udi_interface.Node):
 
     def heartbeat(self):
         logging.debug('heartbeat: ' + str(self.hb))
-        if self.yoAccess.online or self.yoLocal.online:
+        connected = False
+        if self.access_mode in ['hybrid', 'online']
+            if self.yoAccess.online:
+                connected = True
+        if self.access_mode in ['hybrid', 'local']
+            if self.yoLocal.online:
+                connected = True
+        if connected:
             self.my_setDriver('ST', 1)
             if self.hb == 0:
                 self.reportCmd('DON',2)
@@ -633,7 +638,14 @@ class YoLinkSetup (udi_interface.Node):
     def systemPoll (self, polltype):
         if self.pollStart:
             logging.debug('System Poll executing: {}'.format(polltype))
-            if self.yoAccess.online or self.yoLocal.online:
+            connected = False
+            if self.access_mode in ['hybrid', 'online']:
+                if self.yoAccess.online:
+                    connected = True
+            if self.access_mode in ['hybrid', 'local']:
+                if self.yoLocal.online:
+                    connected = True
+            if connected:
                 self.updateEpochTime()
                 self.my_setDriver('ST', 1)
                 if 'longPoll' in polltype:
