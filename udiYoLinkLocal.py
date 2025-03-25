@@ -774,7 +774,7 @@ class YoLinkSetup (udi_interface.Node):
                 self.client_secret = None
 
             if 'SUBNET_ID' in userParam:
-                self.client_secret = userParam['SUBNET_ID']
+                self.subnet_id = userParam['SUBNET_ID']
             else:
                 self.client_secret = None
             if 'LOCAL_IP' in  userParam:
