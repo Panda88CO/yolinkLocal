@@ -124,7 +124,7 @@ class YoLinkInitPAC(object):
                     if self.token != None:
                        self.mqtt_str = 'ylsubnet/'
             else:
-                self.mmode = 'local'
+                self.mode = 'local'
                 self.mqtt_str = 'ylsubnet/'    
 
             #if self.client == None:    
@@ -489,7 +489,7 @@ class YoLinkInitPAC(object):
                 self.client.username_pw_set(username=self.token['access_token'], password=None)
             elif self.mode == 'local':
                 self.client.username_pw_set(username=self.local_client_id, password=self.token['access_token'])
-                
+
             logging.debug('self.client.connect: {}'.format(self.client.connect(self.mqttURL, self.mqttPort, keepalive= self.keepAlive))) # ping server every 30 sec
                 
             self.client.loop_start()
