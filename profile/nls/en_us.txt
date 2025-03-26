@@ -380,8 +380,8 @@ CMD-nlswaterdept-SETATTR-NAME = Set water level alarms
 CMDP-waterLowAlarm-NAME = Low Water Alarm (0-1000)
 CMDP-waterHighAlarm-NAME = High Water Alarm (0-1000)
 
-contype-0=Cloud
-contype-1=Local
+contype-0=Local
+contype-1=Cloud
 contype-99=Unknown
 
 wl_state-99 = Unknown
