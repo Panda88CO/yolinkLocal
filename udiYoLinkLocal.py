@@ -136,6 +136,27 @@ class YoLinkSetup (udi_interface.Node):
         logging.debug('Nodes in Nodeserver - before cleanup: {} - {}'.format(len(self.nodes_in_db),self.nodes_in_db))
         self.configDone = True
 
+
+    def parse_device_lists (self, cloud_list, local_list) -> list:
+        logging.debug('parse_device_lists')
+#[{'deviceId': 'd88b4c010004b251', 'deviceUDID': '49ddf0bc10664337a834310b63850ed3', 'name': 'Motion Sensor', 'token': 'BBBFA35BC4870C56325A7A30C72D22CC', 'type': 'MotionSensor', 'parentDeviceId': None, 'modelName': 'YS7805-UC', 'serviceZone': 'us_west_1'
+        device_list = []
+        local_devIDs = [d['deviceId'] for d in local_list] 
+        cloud_devIDs = [d['deviceId'] for d in cloud_list]        
+        for dev in cloud_list:
+            if dev['deviceId'] in local_devIDs:
+                dev['access'] = 0
+            else:
+                dev['access'] = 1
+            device_list.append(dev)
+        for dev in local_list:
+            if  dev['deviceId'] not in cloud_devIDs:
+                dev['access'] = 0
+                dev['modelName'] = 'Unknown'
+                device_list.append(dev)
+        logging.debug(f'Resulting Device List {device_list}')
+        return(device_list)
+
     def start (self):
         logging.info('Executing start - udi-YoLink')
         logging.info ('Access using PAC/UAC')
@@ -230,17 +251,18 @@ class YoLinkSetup (udi_interface.Node):
         # NEED TO DETERMINE IF LOCAL HUB EXISTS AND THEN GET LIST FROM THAT AS WELL 
         
         
-        
+        deviceListCloud=[]
+        deviceListLocal=[]
         if self.yoAccess:  # get cloud and local devices
             self.yoAccess.retrieve_device_list()
-            self.deviceList = self.yoAccess.getDeviceList()
+            deviceListCloud = self.yoAccess.getDeviceList()
             #self.deviceList = self.yoAccess.get_device_list()
-        elif self.yoLocal: #get only local devices 
-            self.yoLocal.retrieve_device_list()
-            self.deviceList = self.yoLocal.getDeviceList()
-        else:
-            logging.error('SOMETHING WENT WRONG ')
 
+        if self.yoLocal: #get only local devices 
+            self.yoLocal.retrieve_device_list()
+            deviceListLocal = self.yoLocal.getDeviceList()
+
+        self.deviceList = self.parse_device_lists(deviceListCloud, deviceListLocal )
 
         logging.debug('{} devices detected : {}'.format(len(self.deviceList), self.deviceList) )
         if self.yoAccess or self.yoLocal:
@@ -264,22 +286,14 @@ class YoLinkSetup (udi_interface.Node):
                 model = None
                 nodename = str(dev['deviceId'][-14:])
                 address = self.poly.getValidAddress(nodename)
-                if 'modelName' in dev:
-                    model = str(dev['modelName'][:6])
-                if 'serviceZone' in dev:
-                    logging.debug('Service Zone: {}'.format(dev['serviceZone']))
-                    if dev['serviceZone'] is not None:
-                        logging.debug('Local Access selected {}'.format(dev['modelName']))
-                        dev_access = self.yoLocal
-                        dev['access'] = 1
-                    else:
-                        logging.debug('Cloud Access selected {}'.format(dev['modelName']))
-                        dev_access = self.yoAccess
-                        dev['access'] = 0
-                else: # local devices only              
-                    #logging.debug('Local Access selected {}'.format(dev['type']))
+                #if 'modelName' in dev:
+                #    model = str(dev['modelName'][:6])
+                if dev['access'] == 1:
+                    logging.debug('Local Access selected {}'.format(dev['name']))
                     dev_access = self.yoLocal
-                    dev['access'] = 1
+                else:
+                    logging.debug('Cloud Access selected {}'.format(dev['name']))
+                    dev_access = self.yoAccess
                 #if address in self.Parameters:
                 #    name = self.Parameters[address]
                 #else:
