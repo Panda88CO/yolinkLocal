@@ -295,9 +295,11 @@ class YoLinkSetup (udi_interface.Node):
         for dev in deviceList:
             if dev['type']  in self.supportedYoTypes:
                 dev_access = None
+                model = None
                 nodename = str(dev['deviceId'][-14:])
                 address = self.poly.getValidAddress(nodename)
-                model = str(dev['modelName'][:6])
+                if 'modelName' in dev:
+                    model = str(dev['modelName'][:6])
                 if 'serviceZone' in dev:
                     if dev['serviceZone'] is not []:
                         logging.debug('Local Access selected {}'.format(dev['modelName']))
