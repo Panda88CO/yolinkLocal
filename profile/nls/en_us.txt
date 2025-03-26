@@ -9,10 +9,12 @@ CMD-nlssetup-DON-NAME = Heart Beat On
 CMD-nlssetup-DOF-NAME = Heart Beat Off
 CMD-nlssetup-EPOCHTIME-NAME = Update Time
 
+
 # common commands #############
 
 ST-ST-NAME = Nodeserver Status
 ST-GV20-NAME = Connection State
+ST-GV29-NAME = Connection Type
 ST-BATLVL-NAME = Battery Level
 ST-CLITEMP-NAME = Sensor Temperature
 ST-CLIHUM-NAME = Current Rel Humidity (%)
@@ -377,6 +379,10 @@ ST-nlswaterdept-TIME-NAME = Last Data Update (Epoch time min)
 CMD-nlswaterdept-SETATTR-NAME = Set water level alarms
 CMDP-waterLowAlarm-NAME = Low Water Alarm (0-1000)
 CMDP-waterHighAlarm-NAME = High Water Alarm (0-1000)
+
+contype-0=Cloud
+contype-1=Local
+contype-99=Unknown
 
 wl_state-99 = Unknown
 wl_state-98 = Updating (may take up to 1 hour)

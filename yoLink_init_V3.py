@@ -66,7 +66,7 @@ class YoLinkInitPAC(object):
         self.lastTransferTime = int(time.time())
 
         self.local_URL = ''
-        #self.local_port = ':1080'
+        self.local_port_str = ':1080'
         self.local_client_id = ID
         self.local_client_secret = secret
 
@@ -163,7 +163,7 @@ class YoLinkInitPAC(object):
         logging.debug(f'initializeLocalAccess {client_id} {client_secret} {local_ip}')
         self.local_client_id = client_id
         self.local_client_secret = client_secret
-        self.local_URL = 'http://'+local_ip+self.local_port
+        self.local_URL = 'http://'+local_ip+self.local_port_str
         response = requests.post(self.local_URL+'/open/yolink/token', 
                                  data={ "grant_type": "client_credentials",
                                         "client_id" :  self.local_client_id ,

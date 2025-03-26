@@ -253,5 +253,9 @@
    </editor> 
    <editor id="ready"> 
      <range uom="25" subset="0,1" nls="ready" />
+   </editor>    
+   <editor id="contype"> 
+     <range uom="25" subset="0,1,99" nls="contype" />
    </editor>     
+   
 </editors>

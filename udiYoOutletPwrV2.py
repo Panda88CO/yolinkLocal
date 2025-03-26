@@ -55,8 +55,9 @@ class udiYoOutletPwr(udi_interface.Node):
                         
             {'driver': 'GV19', 'value': 0, 'uom': 25}, #days
             {'driver': 'ST', 'value': 0, 'uom': 25},            
-            {'driver': 'GV20', 'value': 99, 'uom': 25},              
-             {'driver': 'TIME', 'value' :int(time.time()), 'uom': 151},
+            {'driver': 'GV29', 'value': 99, 'uom': 25},
+            {'driver': 'GV20', 'value': 99, 'uom': 25},          
+            {'driver': 'TIME', 'value' :int(time.time()), 'uom': 151},
 
             ]
 
@@ -97,6 +98,7 @@ class udiYoOutletPwr(udi_interface.Node):
         #self.my_setDriver('ST', 1)
         self.adr_list = []
         self.adr_list.append(address)
+        self.my_setDriver('GV29', deviceInfo['access'])
 
 
     def start(self):

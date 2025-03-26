@@ -50,7 +50,7 @@ except ImportError:
 
 
 
-version = '0.0.2'
+version = '0.0.3'
 
 
 class YoLinkSetup (udi_interface.Node):
@@ -256,41 +256,7 @@ class YoLinkSetup (udi_interface.Node):
         #self.scheduler.add_job(self.display_update, 'interval', seconds=self.display_update_sec)
         #self.scheduler.start()
         #self.updateEpochTime()
-    '''
-    #def addLocalNodes (self, deviceList):
-    #    logging.debug(f'addLocalNodes : {deviceList}')
-        for dev in deviceList:
-            if dev['type']  in self.supportedLocalYoTypes:
-                nodename = str(dev['deviceId'][-14:])
-                address = self.poly.getValidAddress(nodename)
-                model = str(dev['modelName'][:6])
-                #if 'serviceZone' in dev:
-                #    if  dev['serviceZone']:
-                        
-                #if address in self.Parameters:
-                #    name = self.Parameters[address]
-                #else:
-                name = dev['name']
-                name = self.poly.getValidName(name)
-                self.Parameters[address] =  dev['name']
-                if dev['type'] in ['Switch']:
-                        model = None
-                        if  model in ['YS5708', 'YS5709']:
-                            logging.info('Adding swithSec device {} ({}) as {}'.format( dev['name'], dev['type'], str(name) ))                                        
-                            temp = udiYoSwitchSec(self.poly, address, address, name,  self.yoAccess, dev )
-                        elif  model in ['YS5716']:
-                            logging.info('Adding swithPwr device {} ({}) as {}'.format( dev['name'], dev['type'], str(name) ))                                        
-                            temp = udiYoSwitchPwrSec(self.poly, address, address, name,  self.yoAccess, dev )
-                        else:
-                            logging.info('Adding switch device {} ({}) as {}'.format( dev['name'], dev['type'], str(name) ))                                        
-                            temp = udiYoSwitchL(self.poly, address, address, name,  self.yoLocal, dev )
-                        while not temp.node_ready:
-                            logging.debug( 'Waiting for node {}-{} to be ready'.format(dev['type'] , dev['name']))
-                            time.sleep(4)
-                        for adr in temp.adr_list:
-                            self.assigned_addresses.append(adr)'
-                            ''
-    '''
+
     def addNodes (self, deviceList):
         for dev in deviceList:
             if dev['type']  in self.supportedYoTypes:
@@ -304,12 +270,15 @@ class YoLinkSetup (udi_interface.Node):
                     if dev['serviceZone'] is not []:
                         logging.debug('Local Access selected {}'.format(dev['modelName']))
                         dev_access = self.yoLocal
+                        dev['access'] = 1
                     else:
                         logging.debug('Cloud Access selected {}'.format(dev['modelName']))
-                        dev_access = self.yoAccess     
+                        dev_access = self.yoAccess
+                        dev['access'] = 0  
                 else: # local devices only              
                     #logging.debug('Local Access selected {}'.format(dev['type']))
                     dev_access = self.yoLocal
+                    dev['access'] = 0
                 #if address in self.Parameters:
                 #    name = self.Parameters[address]
                 #else:
