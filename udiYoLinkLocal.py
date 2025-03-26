@@ -150,7 +150,7 @@ class YoLinkSetup (udi_interface.Node):
                                 'PowerFailureAlarm', 'SmartRemoter', 'COSmokeSensor', 'Siren', 'WaterMeterController',
                                 'WaterDepthSensor']
         
-        self.supportedYoTypes = ['Switch','VibrationSensor']
+        #self.supportedYoTypes = ['Switch','VibrationSensor', 'Outlet']
         self.supportedLocalYoTypes = self.supportedYoTypes 
         #self.supportedYoTypes = [ 'WaterDepthSensor', 'VibrationSensor']    
         self.updateEpochTime()
