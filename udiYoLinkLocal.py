@@ -86,7 +86,7 @@ class YoLinkSetup (udi_interface.Node):
         self.client_id = None
         self.client_secret = None
         self.local_ip = ''
-        #self.local_port = ':1080'
+        self.local_port = ':1080'
         self.local_URL = ''
         self.local_MQTT_port = 18080
         
