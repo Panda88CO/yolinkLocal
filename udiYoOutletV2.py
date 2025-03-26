@@ -51,7 +51,7 @@ class udiYoOutlet(udi_interface.Node):
             {'driver': 'ST', 'value': 0, 'uom': 25},            
             {'driver': 'GV29', 'value': 99, 'uom': 25},
             {'driver': 'GV20', 'value': 99, 'uom': 25},           
-             {'driver': 'TIME', 'value' :int(time.time()), 'uom': 151},
+            {'driver': 'TIME', 'value' :int(time.time()), 'uom': 151},
             ]
 
 

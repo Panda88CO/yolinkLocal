@@ -278,7 +278,7 @@ class YoLinkSetup (udi_interface.Node):
                 else: # local devices only              
                     #logging.debug('Local Access selected {}'.format(dev['type']))
                     dev_access = self.yoLocal
-                    dev['access'] = 0
+                    dev['access'] = 1
                 #if address in self.Parameters:
                 #    name = self.Parameters[address]
                 #else:
