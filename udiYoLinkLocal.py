@@ -206,33 +206,33 @@ class YoLinkSetup (udi_interface.Node):
             self.Parameters['TEMP_UNIT'] = 'C'
             logging.debug('TEMP_UNIT: {}'.format(self.temp_unit ))
 
-        if self.yoAccess.online:
+        if self.yoAccess:
             self.yoAccess.set_temp_unit(self.temp_unit )
-        if self.yoLocal.online:
+        if self.yoLocal:
             self.yoLocal.set_temp_unit(self.temp_unit )        
 
         if 'DEBUG_EN' in self.Parameters:
             self.debug = self.Parameters['DEBUG_EN']
         else:
             self.debug = False
-        if self.yoAccess.online:
+        if self.yoAccess:
             self.yoAccess.set_debug(self.debug)
-        if self.yoLocal.online:
+        if self.yoLocal:
             self.yoLocal.set_debug(self.debug)                 
         
         if 'CALLS_PER_MIN' in self.Parameters:
             self.nbr_API_calls = self.Parameters['CALLS_PER_MIN']
             self.nbr_dev_API_calls = self.Parameters['DEV_CALLS_PER_MIN']
-        if self.yoAccess.online:
+        if self.yoAccess:
             self.yoAccess.set_api_limits(self.nbr_API_calls, self.nbr_dev_API_calls)          
         
         # NEED TO DETERMINE IF LOCAL HUB EXISTS AND THEN GET LIST FROM THAT AS WELL 
         
         
         
-        if self.yoAccess.online:
+        if self.yoAccess:  # get cloud and local devices
             self.self.deviceList = self.yoAccess.getDeviceList()
-        else:
+        else: #get only local devices 
              self.self.deviceList = self.yoLocal.getDeviceList()
 
 
