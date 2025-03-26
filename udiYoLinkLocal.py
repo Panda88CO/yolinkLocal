@@ -141,19 +141,24 @@ class YoLinkSetup (udi_interface.Node):
         logging.debug('parse_device_lists')
 #[{'deviceId': 'd88b4c010004b251', 'deviceUDID': '49ddf0bc10664337a834310b63850ed3', 'name': 'Motion Sensor', 'token': 'BBBFA35BC4870C56325A7A30C72D22CC', 'type': 'MotionSensor', 'parentDeviceId': None, 'modelName': 'YS7805-UC', 'serviceZone': 'us_west_1'
         device_list = []
-        local_devIDs = [d['deviceId'] for d in local_list] 
-        cloud_devIDs = [d['deviceId'] for d in cloud_list]        
+        
+        cloud_devs = {}
         for dev in cloud_list:
-            if dev['deviceId'] in local_devIDs:
-                dev['access'] = 0
-            else:
-                dev['access'] = 1
-            device_list.append(dev)
+            cloud_devs[dev['deviceId']] = dev       
+        local_devs = {}
         for dev in local_list:
-            if  dev['deviceId'] not in cloud_devIDs:
+            local_devs[dev['deviceId']] = dev
+    
+        for dev in local_list:
                 dev['access'] = 0
-                dev['modelName'] = 'Unknown'
+                if dev['deviceId'] in cloud_devs:
+                    dev['modelName'] = cloud_devs[dev['deviceId']]['modelName'] 
+                device_list.append(dev)        
+        for dev in cloud_list:
+            if dev['deviceId'] not in local_devs:
+                dev['access'] = 1
                 device_list.append(dev)
+
         logging.debug(f'Resulting Device List {device_list}')
         return(device_list)
 
