@@ -232,9 +232,10 @@ class YoLinkSetup (udi_interface.Node):
         
         if self.yoAccess:  # get cloud and local devices
             self.deviceList = self.yoAccess.getDeviceList()
-        else: #get only local devices 
+        elif self.yoLocal: #get only local devices 
             self.deviceList = self.yoLocal.getDeviceList()
-
+        else:
+            logging.error('SOMETHING WENT WRONG ')
 
 
         logging.debug('{} devices detected : {}'.format(len(self.deviceList), self.deviceList) )
