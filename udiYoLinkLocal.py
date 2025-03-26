@@ -235,7 +235,6 @@ class YoLinkSetup (udi_interface.Node):
             self.yoAccess.retrieve_device_list()
             self.deviceList = self.yoAccess.getDeviceList()
             #self.deviceList = self.yoAccess.get_device_list()
-
         elif self.yoLocal: #get only local devices 
             self.yoLocal.retrieve_device_list()
             self.deviceList = self.yoLocal.getDeviceList()
