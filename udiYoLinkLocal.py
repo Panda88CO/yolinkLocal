@@ -258,6 +258,7 @@ class YoLinkSetup (udi_interface.Node):
 
     def addNodes (self, deviceList):
         for dev in deviceList:
+            logging.debug(f'DEVICE ANALYZED {dev}')
             if dev['type']  in self.supportedYoTypes:
                 dev_access = None
                 model = None
