@@ -493,7 +493,7 @@ class YoLinkInitPAC(object):
                 self.client.username_pw_set(username=self.local_client_id, password=self.local_client_secret)
 
             logging.debug(f'info: {self.mqttURL} {self.mqttPort} {self.keepAlive} {self.token}')
-            temp = self.client.connect(self.mqttURL, self.mqttPort, keepalive= self.keepAlive)
+            temp = self.client.connect('https://'+self.mqttURL, self.mqttPort, keepalive= self.keepAlive)
             logging.debug(f'self.client.connect: {temp}' )               
             self.client.loop_start()
             time.sleep(2)
