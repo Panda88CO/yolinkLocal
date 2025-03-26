@@ -231,9 +231,9 @@ class YoLinkSetup (udi_interface.Node):
         
         
         if self.yoAccess:  # get cloud and local devices
-            self.self.deviceList = self.yoAccess.getDeviceList()
+            self.deviceList = self.yoAccess.getDeviceList()
         else: #get only local devices 
-             self.self.deviceList = self.yoLocal.getDeviceList()
+            self.deviceList = self.yoLocal.getDeviceList()
 
 
 
