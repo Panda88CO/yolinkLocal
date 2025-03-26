@@ -266,14 +266,15 @@ class YoLinkSetup (udi_interface.Node):
                 if 'modelName' in dev:
                     model = str(dev['modelName'][:6])
                 if 'serviceZone' in dev:
-                    if dev['serviceZone'] is not []:
+                    logging.debug('Service Zone: {}'.format(dev['serviceZone']))
+                    if dev['serviceZone'] is not None:
                         logging.debug('Local Access selected {}'.format(dev['modelName']))
                         dev_access = self.yoLocal
                         dev['access'] = 1
                     else:
                         logging.debug('Cloud Access selected {}'.format(dev['modelName']))
                         dev_access = self.yoAccess
-                        dev['access'] = 0  
+                        dev['access'] = 0
                 else: # local devices only              
                     #logging.debug('Local Access selected {}'.format(dev['type']))
                     dev_access = self.yoLocal
