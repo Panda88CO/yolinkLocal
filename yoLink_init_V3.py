@@ -422,6 +422,7 @@ class YoLinkInitPAC(object):
             headers1['Authorization'] = 'Bearer '+ self.token['access_token']
             logging.debug(f'call  {self.apiv2URL} {json.dumps(data)} {headers1}')
             r = requests.post(self.apiv2URL, data=json.dumps(data), headers=headers1, timeout=5) 
+            logging.debug(f'res {r}')
             info = r.json()
             self.deviceList = info['data']['devices']
             logging.debug('self.deviceList : {}'.format(self.deviceList))
