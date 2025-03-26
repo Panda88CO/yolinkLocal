@@ -56,7 +56,7 @@ class YoLinkMQTTDevice(object):
         yolink.nbrPorts = 1
         yolink.nbrOutlets = 1
         yolink.nbrUsb = 0 
-        logging.debug('subscribe_mqtt: {}'.format(yolink.deviceInfo['deviceId']))
+        logging.debug('subscribe_mqtt: {}'.format(yolink.deviceInfo))
         yolink.yoAccess.subscribe_mqtt(deviceInfo['deviceId'], callback)
         yolink.lastDataPacket = ''
         yolink.lastControlPacket = '' 

@@ -501,7 +501,7 @@ class YoLinkInitPAC(object):
             time.sleep(2)
             self.connectedToBroker = True   
             self.loopRunning = True 
-            logging.debug(self.mqttList)
+            logging.debug(f'mqttlist : {self.mqttList}')
             for deviceId in self.mqttList:
                 self.update_mqtt_subscription(deviceId)
                 logging.debug('Updating {} in mqttList'.format(deviceId))
@@ -520,7 +520,7 @@ class YoLinkInitPAC(object):
 
     #@measure_time
     def subscribe_mqtt(self, deviceId, callback):
-        logging.info('Subscribing deviceId {} to MQTT'.format(deviceId))
+        logging.info('Subscribing deviceId {} to MQTT {} {}'.format(deviceId, self.mqtt_str +self.homeID, self.mode))
         topicReq = self.mqtt_str +self.homeID+'/'+ deviceId +'/request'
         topicResp = self.mqtt_str +self.homeID+'/'+ deviceId +'/response'
         topicReport = self.mqtt_str+ self.homeID+'/'+ deviceId +'/report'
@@ -541,7 +541,7 @@ class YoLinkInitPAC(object):
 
     #@measure_time
     def update_mqtt_subscription (self, deviceId):
-        logging.info('update_mqtt_subscription {} '.format(deviceId))
+        logging.info('update_mqtt_subscription {} {} '.format(deviceId, self.mode))
         topicReq = self.mqtt_str +self.homeID+'/'+ deviceId +'/request'
         topicResp = self.mqtt_str +self.homeID+'/'+ deviceId +'/response'
         topicReport = self.mqtt_str +self.homeID+'/'+ deviceId +'/report'
