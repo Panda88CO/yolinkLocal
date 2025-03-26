@@ -416,7 +416,7 @@ class YoLinkInitPAC(object):
             logging.debug('retrieve_device_list')
             data= {}
             data['method'] = 'Home.getDeviceList'
-            data['time'] = str(int(time.time_ns()/1e6))
+            #data['time'] = str(int(time.time_ns()/1e6))
             headers1 = {}
             headers1['Content-type'] = 'application/json'
             headers1['Authorization'] = 'Bearer '+ self.token['access_token']
