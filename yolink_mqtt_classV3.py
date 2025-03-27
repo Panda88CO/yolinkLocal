@@ -40,9 +40,7 @@ class YoLinkMQTTDevice(object):
         #yolink.callback = callback
         #yolink.build_device_api_request_data()
         #yolink.enable_device_api()
-        #{"deviceId": "d88b4c1603007966", "deviceUDID": "75addd8e21394d769b85bc292c553275", "name": "YoLink Hub", "token": "118347ae-d7dc-49da-976b-16fae28d8444", "type": "Hub"}
-        
-        yolinkDelaySupport = ['']
+
         yolink.yoAccess = yoAccess
         yolink.deviceInfo = deviceInfo
         #yolink.deviceId = yolink.deviceInfo['deviceId']

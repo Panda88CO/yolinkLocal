@@ -294,7 +294,7 @@ class YoLinkSetup (udi_interface.Node):
                 address = self.poly.getValidAddress(nodename)
                 #if 'modelName' in dev:
                 #    model = str(dev['modelName'][:6])
-                if dev['access'] == 1:
+                if dev['access'] == 0:
                     logging.debug('Local Access selected {}'.format(dev['name']))
                     dev_access = self.yoLocal
                 else:
@@ -307,7 +307,7 @@ class YoLinkSetup (udi_interface.Node):
                 name = self.poly.getValidName(name)
                 self.Parameters[address] =  dev['name']
 
-                logging.info('adding/checking device : {} - {}'.format(dev['name'], dev['type']))
+                logging.info('adding/checking device : {} - {} {}'.format(dev['name'], dev['type'], dev['access'] ))
                 if dev['type'] == 'Hub':     
                     logging.info('Hub not added - ISY cannot do anything useful with it')    
                     #if  model in ['YS1606',]:
