@@ -413,6 +413,7 @@ pwrmode-99 = Unknown
 suspended-0 = Online
 suspended-1 = Suspended
 suspended-2 = Offline
+suspended-3 = Command Failure
 suspended-99 = Unknown
 
 

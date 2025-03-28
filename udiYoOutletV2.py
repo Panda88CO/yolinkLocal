@@ -21,7 +21,7 @@ from yolinkOutletV2 import YoLinkOutl
 
 
 class udiYoOutlet(udi_interface.Node):
-    from  udiYolinkLib import my_setDriver, prep_schedule, activate_schedule, update_schedule_data, node_queue, wait_for_node_done, mask2key
+    from  udiYolinkLib import my_setDriver, command_ok, prep_schedule, activate_schedule, update_schedule_data, node_queue, wait_for_node_done, mask2key
 
     id = 'yooutlet'
     '''
@@ -60,7 +60,7 @@ class udiYoOutlet(udi_interface.Node):
 
         logging.debug('udiYoOutlet INIT- {}'.format(deviceInfo['name']))
         self.n_queue = []
-     
+        self.poly = polyglot
         self.yoAccess = yoAccess
         self.devInfo =  deviceInfo   
         self.yoOutlet = None
@@ -73,8 +73,8 @@ class udiYoOutlet(udi_interface.Node):
         self.offDelay = 0
         self.schedule_selected = 0
 
-        polyglot.subscribe(polyglot.START, self.start, self.address)
-        polyglot.subscribe(polyglot.STOP, self.stop)
+        self.poly.subscribe(polyglot.START, self.start, self.address)
+        self.poly.subscribe(polyglot.STOP, self.stop)
         self.poly.subscribe(self.poly.ADDNODEDONE, self.node_queue)
                
 
@@ -87,6 +87,7 @@ class udiYoOutlet(udi_interface.Node):
         self.adr_list = []
         self.adr_list.append(address)
         self.my_setDriver('GV29', deviceInfo['access'])
+        self.last_update_time = time.time()
 
     def start(self):
         logging.info('start - YoLinkOutlet')
@@ -115,7 +116,8 @@ class udiYoOutlet(udi_interface.Node):
     def updateData(self):
         logging.info('udiYoOutlet updateData - schedule {}'.format(self.schedule_selected))
         if self.node is not None:
-            self.my_setDriver('TIME', self.yoOutlet.getLastUpdateTime(), 151)
+            self.last_update_time = self.yoOutlet.getLastUpdateTime()
+            self.my_setDriver('TIME', self.last_update_time, 151)
             if  self.yoOutlet.online:
                 self.my_setDriver('ST',1)
                 state = str(self.yoOutlet.getState()).upper()
@@ -169,42 +171,50 @@ class udiYoOutlet(udi_interface.Node):
         self.yoOutlet.refreshDevice()
 
 
+
     def set_outlet_on(self, command = None):
         logging.info('udiYoOutlet set_outlet_on')
+        before_time = self.last_update_time
         self.yoOutlet.setState('ON')
-        self.my_setDriver('GV0',1 )
+        #self.my_setDriver('GV0',1 )
+        if not self.command_ok(before_time):
+            self.my_setDriver('GV20', 3)
+            
+
         #self.node.reportCmd('DON')
 
     def set_outlet_off(self, command = None):
         logging.info('udiYoOutlet set_outlet_off')
+        before_time = self.last_update_time
         self.yoOutlet.setState('OFF')
-        self.my_setDriver('GV0',0 )
+        #self.my_setDriver('GV0',0 )
         #self.node.reportCmd('DOF')
-
+        if not self.command_ok(before_time):
+            self.my_setDriver('GV20', 3)
 
 
     def outletControl(self, command):
-        
+        before_time = self.last_update_time
         ctrl = int(command.get('value'))  
         logging.info('udiYoOutlet outletControl - {}'.format(ctrl))
         ctrl = int(command.get('value'))
         if ctrl == 1:
             self.yoOutlet.setState('ON')
-            self.my_setDriver('GV0',1 )
+            #self.my_setDriver('GV0',1 )
             self.node.reportCmd('DON')
         elif ctrl == 0:
             self.yoOutlet.setState('OFF')
-            self.my_setDriver('GV0',0 )
+            #self.my_setDriver('GV0',0 )
             self.node.reportCmd('DOF')
         elif ctrl == 2: #toggle
             state = str(self.yoOutlet.getState()).upper() 
             if state == 'ON':
                 self.yoOutlet.setState('OFF')
-                self.my_setDriver('GV0',0 )
+                #self.my_setDriver('GV0',0 )
                 self.node.reportCmd('DOF')
             elif state == 'OFF':
                 self.yoOutlet.setState('ON')
-                self.my_setDriver('GV0',1 )
+                #self.my_setDriver('GV0',1 )
                 self.node.reportCmd('DON')                
         elif ctrl == 5:
             logging.info('outletControl set Delays Executed: {} {}'.format(self.onDelay, self.offDelay))
@@ -212,6 +222,9 @@ class udiYoOutlet(udi_interface.Node):
             self.my_setDriver('GV1', self.onDelay * 60)
             self.my_setDriver('GV2', self.offDelay * 60 )
             self.yoOutlet.setDelayList([{'on':self.onDelay, 'off':self.offDelay}]) 
+
+        if not self.command_ok(before_time):
+            self.my_setDriver('GV20', 3)
 
 
             #Unknown remains unknown
