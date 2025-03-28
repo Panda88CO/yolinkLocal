@@ -177,6 +177,7 @@ class udiYoOutlet(udi_interface.Node):
         before_time = self.last_update_time
         self.yoOutlet.setState('ON')
         #self.my_setDriver('GV0',1 )
+        logging.debug(f'LAST UPDATE TIM1 {before_time} {self.last_update_time}')
         if not self.command_ok(before_time):
             self.my_setDriver('GV20', 3)
             
@@ -189,6 +190,7 @@ class udiYoOutlet(udi_interface.Node):
         self.yoOutlet.setState('OFF')
         #self.my_setDriver('GV0',0 )
         #self.node.reportCmd('DOF')
+        logging.debug(f'LAST UPDATE TIME1 {before_time} {self.last_update_time}')
         if not self.command_ok(before_time):
             self.my_setDriver('GV20', 3)
 
@@ -197,6 +199,7 @@ class udiYoOutlet(udi_interface.Node):
         before_time = self.last_update_time
         ctrl = int(command.get('value'))  
         logging.info('udiYoOutlet outletControl - {}'.format(ctrl))
+        logging.debug(f'LAST UPDATE TIME1 {before_time} {self.last_update_time}')
         ctrl = int(command.get('value'))
         if ctrl == 1:
             self.yoOutlet.setState('ON')
