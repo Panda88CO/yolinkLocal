@@ -94,6 +94,8 @@ def command_ok(self, before_time, max_tries = 5):
     loops = 0
     while (self.last_update_time == before_time) and loops < max_tries:
         time.sleep(0.5)
+        loops += loops
+    logging.debug(f'LAST UPDATE TIME {before_time} {self.last_update_time}')
     return(loops < max_tries)        
 
 def mask2key (self, mask):

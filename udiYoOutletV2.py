@@ -87,7 +87,7 @@ class udiYoOutlet(udi_interface.Node):
         self.adr_list = []
         self.adr_list.append(address)
         self.my_setDriver('GV29', deviceInfo['access'])
-        self.last_update_time = time.time()
+        self.last_update_time = 0
 
     def start(self):
         logging.info('start - YoLinkOutlet')
