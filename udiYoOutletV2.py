@@ -116,8 +116,8 @@ class udiYoOutlet(udi_interface.Node):
     def updateData(self):
         logging.info('udiYoOutlet updateData - schedule {}'.format(self.schedule_selected))
         if self.node is not None:
-            self.last_update_time = self.yoOutlet.getLastUpdateTime()
-            self.my_setDriver('TIME', self.last_update_time, 151)
+            self.last_update_time = self.yoOutlet.getLastUpdateTime_ms()
+            self.my_setDriver('TIME', int(self.last_update_time/1000), 151)
             if  self.yoOutlet.online:
                 self.my_setDriver('ST',1)
                 state = str(self.yoOutlet.getState()).upper()
