@@ -21,7 +21,7 @@ import time
 
 
 class udiYoCOSmokeSensor(udi_interface.Node):
-    from  udiYolinkLib import my_setDriver, save_cmd_state, retrieve_cmd_state, bool2nbr, prep_schedule, activate_schedule, update_schedule_data, node_queue, wait_for_node_done, mask2key
+    from  udiYolinkLib import my_setDriver, command_ok, save_cmd_state, retrieve_cmd_state, bool2nbr, prep_schedule, activate_schedule, update_schedule_data, node_queue, wait_for_node_done, mask2key
 
     id = 'yoCOSmokesens'
     
@@ -88,7 +88,7 @@ class udiYoCOSmokeSensor(udi_interface.Node):
         self.temp_unit = self.yoAccess.get_temp_unit()
         self.adr_list = []
         self.adr_list.append(address)
-
+        self.last_update_time = 0
         
 
 
@@ -129,7 +129,8 @@ class udiYoCOSmokeSensor(udi_interface.Node):
 
     def updateData(self):
         if self.node is not None:
-            self.my_setDriver('TIME', self.yoCOSmokeSensor.getLastUpdateTime(), 151)
+            self.last_update_time = self.yoCOSmokeSensor.getLastUpdateTime_ms()
+            self.my_setDriver('TIME', int(self.last_update_time/1000), 151)
 
             if self.yoCOSmokeSensor.online:
                 smoke_alert =   self.yoCOSmokeSensor.alert_state('smoke')  
@@ -189,11 +190,13 @@ class udiYoCOSmokeSensor(udi_interface.Node):
 
     def updateStatus(self, data):
         logging.debug('updateStatus - yoCOSmokeSensor')
+        before_time = self.last_update_time
         logging.debug('device oneline {}'.format(self.yoCOSmokeSensor.online))
         self.yoCOSmokeSensor.updateStatus(data)
         self.updateData()
 
     def set_cmd(self, command):
+        #before_time = self.last_update_time
         ctrl = int(command.get('value'))   
         logging.info('yoCOSmokeSensor  set_cmd - {}'.format(ctrl))
         self.cmd_state = ctrl

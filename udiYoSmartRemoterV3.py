@@ -19,7 +19,7 @@ import math
 from yolinkSmartRemoterV2 import YoLinkSmartRemote
 
 class udiRemoteKey(udi_interface.Node):
-    from  udiYolinkLib import my_setDriver, save_cmd_struct, retrieve_cmd_struct, bool2ISY, prep_schedule, activate_schedule, update_schedule_data, node_queue, wait_for_node_done, mask2key
+    from  udiYolinkLib import my_setDriver, save_cmd_struct, command_ok, retrieve_cmd_struct, bool2ISY, prep_schedule, activate_schedule, update_schedule_data, node_queue, wait_for_node_done, mask2key
 
     id = 'smremotekey'
     drivers = [
@@ -67,7 +67,7 @@ class udiRemoteKey(udi_interface.Node):
         self.poly.addNode(self, conn_status = None, rename = True)
         self.wait_for_node_done()
         self.node = self.poly.getNode(address)
-     
+        self.last_update_time = 0     
         
     def start(self):
         logging.debug('start / initialize smremotekey : {}'.format(self.key))

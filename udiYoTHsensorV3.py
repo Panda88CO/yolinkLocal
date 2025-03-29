@@ -20,7 +20,7 @@ from yolinkTHsensorV2 import YoLinkTHSen
 
 
 class udiYoTHsensor(udi_interface.Node):
-    from  udiYolinkLib import my_setDriver, save_cmd_state, retrieve_cmd_state, state2Nbr, prep_schedule, activate_schedule, update_schedule_data, node_queue, wait_for_node_done, mask2key
+    from  udiYolinkLib import my_setDriver, save_cmd_state, command_ok, retrieve_cmd_state, state2Nbr, prep_schedule, activate_schedule, update_schedule_data, node_queue, wait_for_node_done, mask2key
 
     id = 'yothsens'
     
@@ -101,7 +101,7 @@ class udiYoTHsensor(udi_interface.Node):
         self.node = self.poly.getNode(address)
         self.adr_list = []
         self.adr_list.append(address)
-
+        self.last_update_time = 0
 
   
 
@@ -158,7 +158,8 @@ class udiYoTHsensor(udi_interface.Node):
             self.alarm_state = alarm_det
             
         if self.node is not None:
-            self.my_setDriver('TIME', self.yoTHsensor.getLastUpdateTime(), 151)
+            self.last_update_time = self.yoTHsensor.getLastUpdateTime_ms()
+            self.my_setDriver('TIME', int(self.last_update_time/1000), 151)
 
             if self.yoTHsensor.online:
                 logging.debug("yoTHsensor temp: {}".format(self.yoTHsensor.getTempValueC()))

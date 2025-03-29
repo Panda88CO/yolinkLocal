@@ -20,7 +20,7 @@ from yolinkWaterDeptV2 import YoLinkWaterDept
 
 
 class udiYoWaterDept(udi_interface.Node):
-    from  udiYolinkLib import my_setDriver, save_cmd_state, retrieve_cmd_state, bool2ISY, state2Nbr, prep_schedule, activate_schedule, update_schedule_data, node_queue, wait_for_node_done, mask2key
+    from  udiYolinkLib import my_setDriver, save_cmd_state, command_ok, retrieve_cmd_state, bool2ISY, state2Nbr, prep_schedule, activate_schedule, update_schedule_data, node_queue, wait_for_node_done, mask2key
 
     id = 'yowaterdept'
     
@@ -86,7 +86,7 @@ class udiYoWaterDept(udi_interface.Node):
         self.node = self.poly.getNode(address)
         self.adr_list = []
         self.adr_list.append(address)
-
+        self.last_update_time = 0
 
   
 
@@ -125,7 +125,8 @@ class udiYoWaterDept(udi_interface.Node):
         #limits = self.yoWaterDept.getLimits()
         try:
             if self.node is not None:
-                self.my_setDriver('TIME', self.yoWaterDept.getLastUpdateTime(), 151)
+                self.last_update_time = self.yoOutlet.getLastUpdateTime_ms()
+                self.my_setDriver('TIME', int(self.last_update_time/1000), 151)
 
                 if self.yoWaterDept.online:
                     logging.debug("yoWaterDept : UpdateData")

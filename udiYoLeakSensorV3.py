@@ -21,7 +21,7 @@ import time
 
 
 class udiYoLeakSensor(udi_interface.Node):
-    from  udiYolinkLib import my_setDriver, save_cmd_state, retrieve_cmd_state, prep_schedule, activate_schedule, update_schedule_data, node_queue, wait_for_node_done, mask2key
+    from  udiYolinkLib import my_setDriver, save_cmd_state,command_ok, retrieve_cmd_state, prep_schedule, activate_schedule, update_schedule_data, node_queue, wait_for_node_done, mask2key
 
     id = 'yoleaksens'
     
@@ -72,7 +72,7 @@ class udiYoLeakSensor(udi_interface.Node):
         self.temp_unit = self.yoAccess.get_temp_unit()
         self.adr_list = []
         self.adr_list.append(address)
-
+        self.last_update_time = 0
 
     def start(self):
         logging.info('start - YoLinkLeakSensor')
@@ -118,7 +118,8 @@ class udiYoLeakSensor(udi_interface.Node):
 
     def updateData(self):
         if self.node is not None:
-            self.my_setDriver('TIME', self.yoLeakSensor.getLastUpdateTime(), 151)
+            self.last_update_time = self.yoLeakSensor.getLastUpdateTime_ms()
+            self.my_setDriver('TIME', int(self.last_update_time/1000), 151)
 
             if self.yoLeakSensor.online:
                 waterState =   self.waterState()  

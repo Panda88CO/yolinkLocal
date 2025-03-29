@@ -21,7 +21,7 @@ from yolinkSwitchV2 import YoLinkSW
 from udiYoSmartRemoterV3 import udiRemoteKey
 
 class udiYoSwitchSec(udi_interface.Node):
-    from  udiYolinkLib import my_setDriver, prep_schedule, activate_schedule, update_schedule_data, node_queue, wait_for_node_done, mask2key
+    from  udiYolinkLib import my_setDriver, prep_schedule, command_ok, activate_schedule, update_schedule_data, node_queue, wait_for_node_done, mask2key
     id = 'yoswitchsec'
 
     drivers = [
@@ -87,7 +87,7 @@ class udiYoSwitchSec(udi_interface.Node):
         self.node = self.poly.getNode(address)
         self.adr_list = []
         self.adr_list.append(address)
-        
+        self.last_update_time = 0        
             
 
     def start(self):
@@ -151,7 +151,8 @@ class udiYoSwitchSec(udi_interface.Node):
     def updateData(self):
         if self.node is not None:
             state =  self.yoSwitch.getState().upper()
-            self.my_setDriver('TIME', self.yoSwitch.getLastUpdateTime(), 151)
+            self.last_update_time = self.yoSwitch.getLastUpdateTime_ms()
+            self.my_setDriver('TIME', int(self.last_update_time/1000), 151)
 
             if self.yoSwitch.online:
                 self.my_setDriver('ST', 1)
@@ -248,29 +249,34 @@ class udiYoSwitchSec(udi_interface.Node):
 
     def updateStatus(self, data):
         logging.info('updateStatus - Switch')
+        before_time = self.last_update_time        
         self.yoSwitch.updateStatus(data)
         self.updateData()
  
     def set_switch_on(self, command = None):
         logging.info('udiYoSwitch set_switch_on')  
+        before_time = self.last_update_time        
         self.yoSwitch.setState('ON')
         self.my_setDriver('GV0',1 )
         #self.node.reportCmd('DON')
 
     def set_switch_off(self, command = None):
         logging.info('udiYoSwitch set_switch_off')  
+        before_time = self.last_update_time        
         self.yoSwitch.setState('OFF')
         self.my_setDriver('GV0',0 )
         #self.node.reportCmd('DOF')
 
     def set_switch_fon(self, command = None):
         logging.info('udiYoSwitch set_switch_on')  
+        before_time = self.last_update_time        
         self.yoSwitch.setState('ON')
         self.my_setDriver('GV0',1 )
         #self.node.reportCmd('DFON')
 
     def set_switch_foff(self, command = None):
         logging.info('udiYoSwitch set_switch_off')  
+        before_time = self.last_update_time
         self.yoSwitch.setState('OFF')
         self.my_setDriver('GV0',0 )
         #self.node.reportCmd('DFOF')
@@ -278,6 +284,7 @@ class udiYoSwitchSec(udi_interface.Node):
 
     def switchControl(self, command):
         logging.info('udiYoSwitch switchControl') 
+        before_time = self.last_update_time        
         ctrl = int(command.get('value'))     
         if ctrl == 1:
             self.yoSwitch.setState('ON')
@@ -323,6 +330,7 @@ class udiYoSwitchSec(udi_interface.Node):
 
     def program_delays(self, command):
         logging.info('udiYoOutlet program_delays {}'.format(command))
+        before_time = self.last_update_time        
         query = command.get("query")
         self.onDelay = int(query.get("ondelay.uom44"))
         self.offDelay = int(query.get("offdelay.uom44"))
@@ -338,6 +346,7 @@ class udiYoSwitchSec(udi_interface.Node):
         
     def lookup_schedule(self, command):
         logging.info('udiYoSwitch lookup_schedule {}'.format(command))
+        before_time = self.last_update_time        
         self.schedule_selected = int(command.get('value'))
         self.yoSwitch.refreshSchedules()
 
@@ -373,13 +382,15 @@ class udiYoSwitchSec(udi_interface.Node):
         '''
     def define_schedule(self, command):
         logging.info('udiYoSwitch define_schedule {}'.format(command))
+        before_time = self.last_update_time        
         query = command.get("query")
         self.schedule_selected, params = self.prep_schedule(query)
         self.yoSwitch.setSchedule(self.schedule_selected, params)
 
 
     def control_schedule(self, command):
-        logging.info('udiYoSwitch control_schedule {}'.format(command))       
+        logging.info('udiYoSwitch control_schedule {}'.format(command))      
+        before_time = self.last_update_time         
         query = command.get("query")
         self.activated, self.schedule_selected = self.activate_schedule(query)
         self.yoSwitch.activateSchedule(self.schedule_selected, self.activated)

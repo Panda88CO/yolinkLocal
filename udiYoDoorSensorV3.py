@@ -18,7 +18,7 @@ except ImportError:
 
 
 class udiYoDoorSensor(udi_interface.Node):
-    from  udiYolinkLib import my_setDriver, save_cmd_state, retrieve_cmd_state, prep_schedule, activate_schedule, update_schedule_data, node_queue, wait_for_node_done, mask2key
+    from  udiYolinkLib import my_setDriver, save_cmd_state, retrieve_cmd_state, command_ok, prep_schedule, activate_schedule, update_schedule_data, node_queue, wait_for_node_done, mask2key
 
     id = 'yodoorsens'
     
@@ -70,7 +70,7 @@ class udiYoDoorSensor(udi_interface.Node):
         self.node = self.poly.getNode(address)
         self.adr_list = []
         self.adr_list.append(address)        
-
+        self.last_update_time = 0
 
 
 
@@ -119,7 +119,8 @@ class udiYoDoorSensor(udi_interface.Node):
 
     def updateData(self):
         if self.node is not None:
-            self.my_setDriver('TIME', self.yoDoorSensor.getLastUpdateTime(), 151)
+            self.last_update_time = self.yoDoorSensor.getLastUpdateTime_ms()
+            self.my_setDriver('TIME', int(self.last_update_time/1000), 151)
             if self.yoDoorSensor.online:
                 doorstate = self.doorState()
                 if doorstate == 1:

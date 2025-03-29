@@ -18,7 +18,7 @@ import re
 
 #assigned_addresses
 class udiYoSubOutlet(udi_interface.Node):
-    from  udiYolinkLib import my_setDriver, prep_schedule, activate_schedule, update_schedule_data, node_queue, wait_for_node_done, mask2key
+    from  udiYolinkLib import my_setDriver, prep_schedule,command_ok, activate_schedule, update_schedule_data, node_queue, wait_for_node_done, mask2key
     id = 'yosubout'
     '''
        drivers = [
@@ -153,6 +153,7 @@ class udiYoSubOutlet(udi_interface.Node):
    
     def set_port_on(self, command = None):
         logging.info('udiYoSubOutlet set_port_on')
+        before_time = self.last_update_time        
         self.yolink.setMultiOutState(self.port, 'ON')
         self.my_setDriver('GV0',1 )
         #self.node.reportCmd('DON')
@@ -160,6 +161,7 @@ class udiYoSubOutlet(udi_interface.Node):
 
     def set_port_off(self, command = None):
         logging.info('udiYoSubOutlet set_port_off')
+        before_time = self.last_update_time        
         self.yolink.setMultiOutState(self.port, 'OFF')
         self.my_setDriver('GV0',0 )
         #self.node.reportCmd('DOF')
@@ -167,7 +169,7 @@ class udiYoSubOutlet(udi_interface.Node):
 
     def switchControl(self, command):
         logging.info('udiYoSubOutlet switchControl')
-
+        before_time = self.last_update_time
         ctrl = int(command.get('value'))     
         if ctrl == 0:
             self.yolink.setMultiOutState(self.port, 'OFF')
@@ -215,6 +217,7 @@ class udiYoSubOutlet(udi_interface.Node):
 
     def program_delays(self, command):
         logging.info('udiYoOutlet program_delays {}'.format(command))
+        before_time = self.last_update_time        
         query = command.get("query")
         self.onDelay = int(query.get("ondelay.uom44"))
         self.offDelay = int(query.get("offdelay.uom44"))
@@ -258,7 +261,7 @@ class udiYoSubOutlet(udi_interface.Node):
 
 
 class udiYoSubUSB(udi_interface.Node):
-    from  udiYolinkLib import my_setDriver, prep_schedule, activate_schedule, update_schedule_data, node_queue, wait_for_node_done, mask2key
+    from  udiYolinkLib import my_setDriver,command_ok, prep_schedule, activate_schedule, update_schedule_data, node_queue, wait_for_node_done, mask2key
     id = 'yosubusb'
     '''
        drivers = [
@@ -351,7 +354,7 @@ class udiYoSubUSB(udi_interface.Node):
 
     def usbControl(self, command):
         logging.info('udiYoSubUSB - usbControl')
-
+        before_time = self.last_update_time
         ctrl = int(command.get('value'))     
         if ctrl == 1:
             self.yolink.setUsbState(self.usbPort, 'ON')
@@ -378,6 +381,7 @@ class udiYoSubUSB(udi_interface.Node):
   
     def usb_on(self, command = None ):
         logging.info('udiYoSubUSB - usb_on')
+        before_time = self.last_update_time        
         self.yolink.setUsbState(self.usbPort, 'ON')
         self.my_setDriver('GV0', 1)
         #self.node.reportCmd('DON')
@@ -385,6 +389,7 @@ class udiYoSubUSB(udi_interface.Node):
 
     def usb_off(self, command = None):
         logging.info('udiYoSubUSB - usb_off')
+        before_time = self.last_update_time        
         self.yolink.setUsbState(self.usbPort, 'OFF')
         self.my_setDriver('GV0', 0)
         #self.node.reportCmd('DOF')  
@@ -403,7 +408,7 @@ class udiYoSubUSB(udi_interface.Node):
                 }
 
 class udiYoMultiOutlet(udi_interface.Node):
-    from  udiYolinkLib import my_setDriver, prep_schedule, activate_schedule, update_schedule_data, node_queue, wait_for_node_done, mask2key
+    from  udiYolinkLib import my_setDriver, command_ok, prep_schedule, activate_schedule, update_schedule_data, node_queue, wait_for_node_done, mask2key
     id = 'yomultiout'
 
     '''
@@ -474,6 +479,7 @@ class udiYoMultiOutlet(udi_interface.Node):
         self.node_fully_config = False
         self.node_ready = True
         self.schedule_selected = 0
+        self.last_update_time = 0
 
     def start(self):
         #self.node_fully_config = False
@@ -583,7 +589,9 @@ class udiYoMultiOutlet(udi_interface.Node):
 
         if self.node_fully_config:
             self.my_setDriver('ST',1)
-            self.my_setDriver('TIME', self.yoMultiOutlet.getLastUpdateTime(), 151)
+            self.last_update_time = self.yoMultiOutlet.getLastUpdateTime_ms()
+            self.my_setDriver('TIME', int(self.last_update_time/1000), 151)
+
 
             for outlet in range(0,self.nbrOutlets):
                 portName = 'port'+str(outlet)
@@ -648,6 +656,7 @@ class udiYoMultiOutlet(udi_interface.Node):
     def updateStatus(self, data):
         
         logging.debug('updateStatus - udiYoMultiOutlet: {}'.format(self.devInfo['name']))
+        before_time = self.last_update_time        
         #self.yoMultiOutlet.online =  self.yoMultiOutlet.checkOnlineStatus(data)
         #if self.yoMultiOutlet.online:
         self.yoMultiOutlet.updateStatus(data)
@@ -667,18 +676,21 @@ class udiYoMultiOutlet(udi_interface.Node):
 
     def lookup_schedule(self, command):
         logging.info('udiYoMultiOutlet lookup_schedule {}'.format(command))
+        before_time = self.last_update_time        
         self.schedule_selected = int(command.get('value'))
         self.yoMultiOutlet.refreshSchedules()
 
     def define_schedule(self, command):
         logging.info('udiYoSwitch define_schedule {}'.format(command))
+        before_time = self.last_update_time        
         query = command.get("query")
         self.schedule_selected, params = self.prep_schedule(query)
         self.yoMultiOutlet.setSchedule(self.schedule_selected, params)
 
 
     def control_schedule(self, command):
-        logging.info('udiYoSwitch control_schedule {}'.format(command))       
+        logging.info('udiYoSwitch control_schedule {}'.format(command))     
+        before_time = self.last_update_time          
         query = command.get("query")
         self.activated, self.schedule_selected = self.activate_schedule(query)
         self.yoMultiOutlet.activateSchedule(self.schedule_selected, self.activated)

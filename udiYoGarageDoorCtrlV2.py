@@ -61,7 +61,9 @@ class udiYoGarageDoor(udi_interface.Node):
         self.node = self.poly.getNode(address)
         self.adr_list = []
         self.adr_list.append(address)
+        self.last_update_time = 0
 
+        
     def node_queue(self, data):
         self.n_queue.append(data['address'])
 
