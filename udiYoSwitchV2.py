@@ -338,6 +338,8 @@ class udiYoSwitch(udi_interface.Node):
         self.yoSwitch.activateSchedule(self.schedule_selected, self.activated)
         if not self.command_ok(before_time):
             self.my_setDriver('GV20', 3)
+
+            
     commands = {
                 'UPDATE'        : update,
                 'QUERY'         : update,
