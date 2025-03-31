@@ -194,6 +194,9 @@ class udiYoCOSmokeSensor(udi_interface.Node):
         logging.debug('device oneline {}'.format(self.yoCOSmokeSensor.online))
         self.yoCOSmokeSensor.updateStatus(data)
         self.updateData()
+        if not self.command_ok(before_time):
+            self.my_setDriver('GV20', 3)
+            
 
     def set_cmd(self, command):
         #before_time = self.last_update_time

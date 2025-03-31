@@ -163,9 +163,13 @@ class udiYoWaterDept(udi_interface.Node):
 
     def updateStatus(self, data):
         logging.debug('udiYoWaterDept - updateStatus')
+        before_time = self.last_update_time 
         self.yoWaterDept.updateStatus(data)
         self.updateData()
+        if not self.command_ok(before_time):
+            self.my_setDriver('GV20', 3)
 
+            
     def set_attributes(self, command):
         logging.info('udiYoWaterDept  set_attributes - {}'.format(command))
         attribs = {}

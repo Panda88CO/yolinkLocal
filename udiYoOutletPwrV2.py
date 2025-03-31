@@ -239,16 +239,19 @@ class udiYoOutletPwr(udi_interface.Node):
         logging.info('udiYoOutlet set_outlet_on')
         before_time = self.last_update_time        
         self.yoOutlet.setState('ON')
-        self.my_setDriver('GV0',1 )
+        #self.my_setDriver('GV0',1 )
         #self.node.reportCmd('DON')
+        if not self.command_ok(before_time):
+            self.my_setDriver('GV20', 3)        
 
     def set_outlet_off(self, command = None):
         logging.info('udiYoOutlet set_outlet_off')
         before_time = self.last_update_time        
         self.yoOutlet.setState('OFF')
-        self.my_setDriver('GV0',0 )
+        #self.my_setDriver('GV0',0 )
         #self.node.reportCmd('DOF')
-
+        if not self.command_ok(before_time):
+            self.my_setDriver('GV20', 3)
 
 
     def outletControl(self, command):        
@@ -280,7 +283,8 @@ class udiYoOutletPwr(udi_interface.Node):
             self.my_setDriver('GV1', self.onDelay * 60)
             self.my_setDriver('GV2', self.offDelay * 60 )
             self.yoOutlet.setDelayList([{'on':self.onDelay, 'off':self.offDelay}]) 
-
+        if not self.command_ok(before_time):
+            self.my_setDriver('GV20', 3)
 
             #Unknown remains unknown
         
@@ -300,7 +304,10 @@ class udiYoOutletPwr(udi_interface.Node):
 
     def update(self, command = None):
         logging.info('Update Status Executed')
+        before_time = self.last_update_time       
         self.yoOutlet.refreshDevice()
+        if not self.command_ok(before_time):
+            self.my_setDriver('GV20', 3)
 
     def program_delays(self, command):
         logging.info('udiYoOutlet program_delays {}'.format(command))
@@ -318,6 +325,8 @@ class udiYoOutletPwr(udi_interface.Node):
         before_time = self.last_update_time        
         self.schedule_selected = int(command.get('value'))
         self.yoOutlet.refreshSchedules()
+        if not self.command_ok(before_time):
+            self.my_setDriver('GV20', 3)
 
     def define_schedule(self, command):
         logging.info('udiYoSwitch define_schedule {}'.format(command))
@@ -325,7 +334,8 @@ class udiYoOutletPwr(udi_interface.Node):
         query = command.get("query")
         self.schedule_selected, params = self.prep_schedule(query)
         self.yoOutlet.setSchedule(self.schedule_selected, params)
-
+        if not self.command_ok(before_time):
+            self.my_setDriver('GV20', 3)
 
     def control_schedule(self, command):
         logging.info('udiYoSwitch control_schedule {}'.format(command))     
@@ -333,7 +343,8 @@ class udiYoOutletPwr(udi_interface.Node):
         query = command.get("query")
         self.activated, self.schedule_selected = self.activate_schedule(query)
         self.yoOutlet.activateSchedule(self.schedule_selected, self.activated)
-        
+        if not self.command_ok(before_time):
+            self.my_setDriver('GV20', 3)        
 
 
     commands = {

@@ -154,18 +154,21 @@ class udiYoSiren(udi_interface.Node):
         if state == 1:
             self.yoSiren.setState('on')
             self.sirenState = 1
-            self.node.setDriver('GV0',self.sirenState , True, True)
+            #self.node.setDriver('GV0',self.sirenState , True, True)
         else:
             self.yoSiren.setState('off')
             self.sirenState  = 0
-            self.node.setDriver('GV0', self.sirenState , True, True)
-
+            #self.node.setDriver('GV0', self.sirenState , True, True)
+        if not self.command_ok(before_time):
+            self.my_setDriver('GV20', 3)
 
 
     def update(self, command = None):
         logging.info('Update Status Executed')
+        before_time = self.last_update_time   
         self.yoSiren.refreshDevice()
-
+        if not self.command_ok(before_time):
+            self.my_setDriver('GV20', 3)
 
 
     commands = {

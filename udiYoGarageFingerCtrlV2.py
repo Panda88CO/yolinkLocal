@@ -21,7 +21,7 @@ from yolinkGarageFingerToggleV2 import YoLinkGarageFingerCtrl
 
 
 class udiYoGarageFinger(udi_interface.Node):
-    from  udiYolinkLib import my_setDriver
+    from  udiYolinkLib import my_setDriver, command_ok
     id = 'yogarage'
     
     '''
@@ -117,8 +117,11 @@ class udiYoGarageFinger(udi_interface.Node):
 
     def toggleDoor(self, command = None):
         logging.info('GarageFinger Toggle Door')
+        before_time = self.last_update_time   
         self.yoDoorControl.toggleDevice()
-
+        if not self.command_ok(before_time):
+            self.my_setDriver('GV20', 3)
+            
     commands = {
                     'TOGGLE': toggleDoor,
                     'DON'   : toggleDoor,

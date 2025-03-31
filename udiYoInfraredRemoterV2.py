@@ -147,7 +147,8 @@ class udiYoInfraredRemoter(udi_interface.Node):
         before_time = self.last_update_time        
         code = int(command.get('value'))
         self.yoIRrem.send_code(code)
-
+        if not self.command_ok(before_time):
+            self.my_setDriver('GV20', 3)
     '''
     def learn_IRcode(self, command):
         logging.info('udiIRremote learn_IRcode')

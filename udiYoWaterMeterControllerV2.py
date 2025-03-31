@@ -204,9 +204,11 @@ class udiYoWaterMeterController(udi_interface.Node):
             
     def updateStatus(self, data):
         logging.info('updateStatus - udiYoWaterMeterController')
+        before_time = self.last_update_time  
         self.yoWaterCtrl.updateStatus(data)
         self.updateData()
-
+        if not self.command_ok(before_time):
+            self.my_setDriver('GV20', 3)
     '''
     def updateDelayCountdown( self, timeRemaining):
 
@@ -253,8 +255,9 @@ class udiYoWaterMeterController(udi_interface.Node):
         before_time = self.last_update_time        
         self.yoWaterCtrl.setState('open')
         self.valveState  = 1
-        self.my_setDriver('GV0',self.valveState )
-
+        #self.my_setDriver('GV0',self.valveState )
+        if not self.command_ok(before_time):
+            self.my_setDriver('GV20', 3)
         #self.node.reportCmd('DON')
 
     def set_close(self, command = None):
@@ -262,8 +265,9 @@ class udiYoWaterMeterController(udi_interface.Node):
         before_time = self.last_update_time        
         self.yoWaterCtrl.setState('closed')
         self.valveState  = 0
-        self.my_setDriver('GV0',self.valveState )
-
+        #self.my_setDriver('GV0',self.valveState )
+        if not self.command_ok(before_time):
+            self.my_setDriver('GV20', 3)
         #self.node.reportCmd('DOF')
 
 
@@ -288,8 +292,10 @@ class udiYoWaterMeterController(udi_interface.Node):
 
     def update(self, command = None):
         logging.info('Update Status Executed')
+        before_time = self.last_update_time 
         self.yoWaterCtrl.refreshDevice()
-
+        if not self.command_ok(before_time):
+            self.my_setDriver('GV20', 3)
 
 
     commands = {

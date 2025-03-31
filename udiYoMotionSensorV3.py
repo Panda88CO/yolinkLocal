@@ -170,9 +170,13 @@ class udiYoMotionSensor(udi_interface.Node):
 
     def updateStatus(self, data):
         logging.info('updateStatus - udiYoLinkMotionSensor')
+        before_time = self.last_update_time   
         self.yoMotionsSensor.updateStatus(data)
         #time.sleep(1)
         self.updateData()
+        if not self.command_ok(before_time):
+            self.my_setDriver('GV20', 3)
+
 
     def set_cmd(self, command):
         ctrl = int(command.get('value'))   

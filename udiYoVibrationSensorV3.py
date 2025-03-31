@@ -156,9 +156,12 @@ class udiYoVibrationSensor(udi_interface.Node):
 
     def updateStatus(self, data):
         logging.info('updateStatus - udiYoLinkVibrationSensor')
+        before_time = self.last_update_time    
         self.yoVibrationSensor.updateStatus(data)
         self.updateData()
-
+        if not self.command_ok(before_time):
+            self.my_setDriver('GV20', 3)
+            
     def set_cmd(self, command):
         ctrl = int(command.get('value'))   
         logging.info('udiYoVibrationSensor  set_cmd - {}'.format(ctrl))

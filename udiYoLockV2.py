@@ -154,16 +154,19 @@ class udiYoLock(udi_interface.Node):
         logging.info('udiYoLock set_lock')
         before_time = self.last_update_time        
         self.yoLock.setState('LOCK')
-        self.my_setDriver('GV0',1 )
+        #self.my_setDriver('GV0',1 )
         self.node.reportCmd('DON')
+        if not self.command_ok(before_time):
+            self.my_setDriver('GV20', 3)        
 
     def set_unlock(self, command = None):
         logging.info('udiYoLock set_outlet_off')
         before_time = self.last_update_time
         self.yoLock.setState('UNLOCK')
-        self.my_setDriver('GV0',0 )
+        #self.my_setDriver('GV0',0 )
         self.node.reportCmd('DOF')
-
+        if not self.command_ok(before_time):
+            self.my_setDriver('GV20', 3)
 
 
     def lockControl(self, command):
@@ -179,13 +182,16 @@ class udiYoLock(udi_interface.Node):
             self.yoLock.setState('UNLOCK')
             self.my_setDriver('GV0',0 )
             self.node.reportCmd('DOF')
-      
+        if not self.command_ok(before_time):
+            self.my_setDriver('GV20', 3)      
         
         
     def update(self, command = None):
         logging.info('Update Status Executed')
+        before_time = self.last_update_time
         self.yoLock.refreshDevice()
-        
+        if not self.command_ok(before_time):
+            self.my_setDriver('GV20', 3)        
  
 
 
