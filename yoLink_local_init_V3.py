@@ -35,21 +35,21 @@ DEBUG = False
 class YoLinkInitLocal(object):
     def __init__(self, client_id, client_secret, local_ip,  localPort = 1080):
         self.disconnect_occured = False 
-        self.tokenLock = Lock()
-        self.fileLock = Lock()
-        self.TimeTableLock = Lock()
-        self.publishQueue = Queue()
+        #self.tokenLock = Lock()
+        #self.fileLock = Lock()
+        #self.TimeTableLock = Lock()
+        #self.publishQueue = Queue()
         #self.delayQueue = Queue()
-        self.messageQueue = Queue()
-        self.fileQueue = Queue()
+        #self.messageQueue = Queue()
+        #self.fileQueue = Queue()
         #self.timeQueue = Queue()
-        self.MAX_MESSAGES = 100  # number of messages per self.MAX_TIME
-        self.MAX_TIME = 30      # Time Window
-        self.time_tracking_dict = {} # structure to track time so we do not violate yolink publishing requirements
-        self.debug = False
+        #self.MAX_MESSAGES = 100  # number of messages per self.MAX_TIME
+        #self.MAX_TIME = 30      # Time Window
+        #self.time_tracking_dict = {} # structure to track time so we do not violate yolink publishing requirements
+        #self.debug = False
         #self.pendingDict = {}
-        self.pending_messages = 0
-        self.time_since_last_message_RX = 0
+        #self.pending_messages = 0
+        #self.time_since_last_message_RX = 0
         #self.tokenURL = tokenURL
         #self.apiv2URL = pacURL
         #self.mqttURL = mqttURL
@@ -74,7 +74,7 @@ class YoLinkInitLocal(object):
         #self.timeExpMarging = 7170 #min for testing 
         self.tmpData = {}
         self.lastDataPacket = {}
-        self.mqttList = {}
+        #self.mqttList = {}
         self.TtsMessages = {}
         self.nbrTTS = 0
         self.temp_unit = 0
@@ -447,11 +447,11 @@ class YoLinkInitLocal(object):
         #    worked = True               
         #data['time'] = str(int(time.time_ns()//1e6))# we assign time just before publish
         data['method'] = methodStr
-        data["targetDevice"] =  'd88b4c0100092ca9'
+        data["targetDevice"] =  self.deviceInfo['deviceId']
         data["token"]= self.deviceInfo['token']
         logging.debug(self.type+' - setDevice -data {}'.format(data))
         if worked:
-            self.yoAccess.publish_data(data)
+            self._callApi('POST', '')
             #while  not self.yoAccess.publish_data( data) and attempt <= maxAttempts:
             #    time.sleep(10.1) # we can only try 6 timer per minute per device 
             #    attempt = attempt + 1

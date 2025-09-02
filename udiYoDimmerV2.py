@@ -22,7 +22,7 @@ import time
 from yolinkDimmerV3 import YoLinkDim
 
 class udiYoDimmer(udi_interface.Node):
-    from  udiYolinkLib import  my_setDriver, save_cmd_struct, retrieve_cmd_struct, prep_schedule, activate_schedule, update_schedule_data, node_queue, wait_for_node_done, mask2key
+    from  udiYolinkLib import  my_setDriver, save_cmd_struct, retrieve_cmd_struct, command_ok, prep_schedule, activate_schedule, update_schedule_data, node_queue, wait_for_node_done, mask2key
     id = 'yodimmer'
     drivers = [
             {'driver': 'GV0', 'value': 99, 'uom': 25},
@@ -100,6 +100,7 @@ class udiYoDimmer(udi_interface.Node):
         self.node = self.poly.getNode(address)
         self.adr_list = []
         self.adr_list.append(address)
+        self.last_update_time = 0        
 
 
     def start(self):
@@ -155,7 +156,8 @@ class udiYoDimmer(udi_interface.Node):
         logging.info('udiYoDimmer -  updateData{}'.format(self.schedule_selected))
 
         if self.node is not None:
-            self.my_setDriver('TIME', self.yoDimmer.getLastUpdateTime(), 151)
+            self.last_update_time = self.yoDimmer.getLastUpdateTime_ms()
+            self.my_setDriver('TIME', int(self.last_update_time/1000), 151)
             state =  self.yoDimmer.getState().upper()
             self.dim_setting['dim'] = self.yoDimmer.brightness
             if self.yoDimmer.online:
@@ -212,52 +214,74 @@ class udiYoDimmer(udi_interface.Node):
 
     def updateStatus(self, data):
         logging.info('updateStatus - Switch')
+        before_time = self.last_update_time        
         self.yoDimmer.updateStatus(data)
         self.updateData()
+        if not self.command_ok(before_time):
+            self.my_setDriver('GV20', 3)
  
     def set_switch_on(self, command = None):
         logging.info('udiyoDimmer set_switch_on')  
+        before_time = self.last_update_time        
         self.yoDimmer.setState('ON')
-        self.my_setDriver('GV0',1 )
+        #self.my_setDriver('GV0',1 )
         self.node.reportCmd('DON')
+        if not self.command_ok(before_time):
+            self.my_setDriver('GV20', 3)
 
     def set_switch_off(self, command = None):
-        logging.info('udiYoDimmer set_switch_off')  
+        logging.info('udiYoDimmer set_switch_off') 
+        before_time = self.last_update_time        
         self.yoDimmer.setState('OFF')
-        self.my_setDriver('GV0',0 )
+        #self.my_setDriver('GV0',0 )
         self.node.reportCmd('DOF')
+        if not self.command_ok(before_time):
+            self.my_setDriver('GV20', 3)
 
     def set_switch_fon(self, command = None):
         logging.info('udiyoDimmer set_switch_on')  
+        before_time = self.last_update_time        
         self.yoDimmer.setState('ON')
-        self.my_setDriver('GV0',1 )
+        #self.my_setDriver('GV0',1 )
         self.node.reportCmd('DFON')
+        if not self.command_ok(before_time):
+            self.my_setDriver('GV20', 3)        
 
     def set_switch_foff(self, command = None):
-        logging.info('udiYoDimmer set_switch_off')  
+        logging.info('udiYoDimmer set_switch_off') 
+        before_time = self.last_update_time        
         self.yoDimmer.setState('OFF')
-        self.my_setDriver('GV0',0 )
+        #self.my_setDriver('GV0',0 )
         self.node.reportCmd('DFOF')
+        if not self.command_ok(before_time):
+            self.my_setDriver('GV20', 3)        
 
 
     def increase_level(self, command = None):
         logging.info(f'udiYoDimmer increase_level - {command}') 
+        before_time = self.last_update_time        
         self.yoDimmer.brightness += self.dimmer_step
         self.yoDimmer.setBrightness(self.yoDimmer.brightness)
-        self.my_setDriver('GV3', self.yoDimmer.brightness)
+        #self.my_setDriver('GV3', self.yoDimmer.brightness)
         #self.my_setDriver('GV0',0 )
         #self.node.reportCmd('DFOF')
+        if not self.command_ok(before_time):
+            self.my_setDriver('GV20', 3)        
 
     def decrease_level(self, command = None):
         logging.info(f'udiYoDimmer decrease_level - {command}')
+        before_time = self.last_update_time        
         self.yoDimmer.brightness -= self.dimmer_step
         self.yoDimmer.setBrightness(self.yoDimmer.brightness) 
-        self.my_setDriver('GV3', self.yoDimmer.brightness)
+        #self.my_setDriver('GV3', self.yoDimmer.brightness)
         #self.my_setDriver('GV0',0 )
         #self.node.reportCmd('DFOF')
+        if not self.command_ok(before_time):
+            self.my_setDriver('GV20', 3)
 
     def scene_dim(self, command = None):
         logging.info(f'udiYoDimmer scene_dim - {command}')
+        before_time = self.last_update_time        
         ctrl = str(command.get('cmd')  )
         if ctrl == 'FDUP':
             logging.debug('FDUP detected')
@@ -275,9 +299,12 @@ class udiYoDimmer(udi_interface.Node):
             self.save_cmd_struct(self.dim_setting)
         elif ctrl == 'FDSTOP':
             logging.debug('FDSTOP detected')
+        if not self.command_ok(before_time):
+            self.my_setDriver('GV20', 3)            
 
     def set_dimmer_level(self, command = None):
         brightness = int(command.get('value'))
+        before_time = self.last_update_time        
         #self.brightness = brightness
         logging.info('udiYoDimmer set_dimmer_level:{}'.format(brightness) )
         if 0 >= brightness :
@@ -286,46 +313,55 @@ class udiYoDimmer(udi_interface.Node):
         elif 100 <=  brightness:
             brightness = 100
         self.yoDimmer.setBrightness(brightness) #????
-        self.my_setDriver('GV3',brightness )
+        #self.my_setDriver('GV3',brightness )
         self.dim_setting['dim'] = brightness
         self.save_cmd_struct(self.dim_setting)
+        if not self.command_ok(before_time):
+            self.my_setDriver('GV20', 3)        
 
     def setDimUp(self, command = None):
         logging.debug(f'setDimUp {command}')
+        before_time = self.last_update_time
         dimlvl = int(command.get('value'))
         self.dim_setting['dim_up'] = dimlvl
-        self.my_setDriver('GV5', self.dim_setting['dim_up'])
+        #.my_setDriver('GV5', self.dim_setting['dim_up'])
         self.save_cmd_struct(self.dim_setting)
+        if not self.command_ok(before_time):
+            self.my_setDriver('GV20', 3)
 
     def setDimDown(self, command = None):
         logging.debug(f'setDimDown {command}')
+        before_time = self.last_update_time        
         dimlvl = int(command.get('value'))
         self.dim_setting['dim_down'] = dimlvl
-        self.my_setDriver('GV4', self.dim_setting['dim_down'])
+        #self.my_setDriver('GV4', self.dim_setting['dim_down'])
         self.save_cmd_struct(self.dim_setting)
+        if not self.command_ok(before_time):
+            self.my_setDriver('GV20', 3)
 
     def switchControl(self, command):
         logging.info('udiYoDimmer switchControl')
+        before_time = self.last_update_time        
         ctrl = command.get('value')   
         logging.debug('switchControl : {}'.format(ctrl))
         if ctrl == 1:
             self.yoDimmer.setState('ON')
-            self.my_setDriver('GV0',1 )
+            #self.my_setDriver('GV0',1 )
             self.node.reportCmd('DON')
         elif ctrl == 0:
             self.yoDimmer.setState('OFF')
-            self.my_setDriver('GV0',0 )
+            #self.my_setDriver('GV0',0 )
             self.node.reportCmd('DOF')
         elif ctrl == 2: #toggle
             state = str(self.yoDimmer.getState()).upper() 
             logging.debug('switchControl : {}, {}'.format(ctrl, state))
             if state == 'ON':
                 self.yoDimmer.setState('OFF')
-                self.my_setDriver('GV0',0 )
+                #self.my_setDriver('GV0',0 )
                 self.node.reportCmd('DOF')
             elif state == 'OFF':
                 self.yoDimmer.setState('ON')
-                self.my_setDriver('GV0',1 )
+                #self.my_setDriver('GV0',1 )
                 self.node.reportCmd('DON')
             #Unknown remains unknown
         elif ctrl == 5:
@@ -334,52 +370,75 @@ class udiYoDimmer(udi_interface.Node):
             self.my_setDriver('GV1', self.onDelay * 60)
             self.my_setDriver('GV2', self.offDelay * 60 )
             self.yoDimmer.setDelayList([{'on':self.onDelay, 'off':self.offDelay}]) 
+        if not self.command_ok(before_time):
+            self.my_setDriver('GV20', 3)
+
 
     def setOnDelay(self, command ):
         logging.info('udiYoDimmer setOnDelay')
+        before_time = self.last_update_time        
         self.onDelay =int(command.get('value'))
         self.yoDimmer.setOnDelay(self.onDelay )
         self.my_setDriver('GV1', self.onDelay *60)
+        if not self.command_ok(before_time):
+            self.my_setDriver('GV20', 3)
 
     def setOffDelay(self, command):
         logging.info('udiYoDimmer setOffDelay')
+        before_time = self.last_update_time        
         self.offDelay  =int(command.get('value'))
         self.yoDimmer.setOffDelay(self.offDelay)
         self.my_setDriver('GV2', self.offDelay*60)
+        if not self.command_ok(before_time):
+            self.my_setDriver('GV20', 3)        
 
     def program_delays(self, command):
         logging.info('udiYoDimmer program_delays {}'.format(command))
+        before_time = self.last_update_time        
         query = command.get("query")
         self.onDelay = int(query.get("ondelay.uom44"))
         self.offDelay = int(query.get("offdelay.uom44"))
         self.my_setDriver('GV1', self.onDelay * 60)
         self.my_setDriver('GV2', self.offDelay * 60 )
         self.yoDimmer.setDelayList([{'on':self.onDelay, 'off':self.offDelay}]) 
-
+        if not self.command_ok(before_time):
+            self.my_setDriver('GV20', 3)
 
     def lookup_schedule(self, command):
         logging.info('udiYoDimmer lookup_schedule {}'.format(command))
+        before_time = self.last_update_time        
         self.schedule_selected = int(command.get('value'))
         self.yoDimmer.refreshSchedules()
+        if not self.command_ok(before_time):
+            self.my_setDriver('GV20', 3)
+
 
     def define_schedule(self, command):
         logging.info('udiYoSwitch define_schedule {}'.format(command))
+        before_time = self.last_update_time        
         query = command.get("query")
         self.schedule_selected, params = self.prep_schedule(query)
         self.yoDimmer.setSchedule(self.schedule_selected, params)
-
+        if not self.command_ok(before_time):
+            self.my_setDriver('GV20', 3)
 
     def control_schedule(self, command):
-        logging.info('udiYoSwitch control_schedule {}'.format(command))       
+        logging.info('udiYoSwitch control_schedule {}'.format(command))  
+        before_time = self.last_update_time        
         query = command.get("query")
         self.activated, self.schedule_selected = self.activate_schedule(query)
         self.yoDimmer.activateSchedule(self.schedule_selected, self.activated)
+        if not self.command_ok(before_time):
+            self.my_setDriver('GV20', 3)
+
 
     def update(self, command = None):
         logging.info('udiYoDimmer Update Status')
+        before_time = self.last_update_time        
         self.yoDimmer.refreshDevice()
         #self.yoDimmer.refreshSchedules()     
-
+        if not self.command_ok(before_time):
+            self.my_setDriver('GV20', 3)
 
     commands = {
                 'UPDATE': update,

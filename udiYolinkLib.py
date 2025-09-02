@@ -89,7 +89,14 @@ def my_setDriver(self, key, value, Unit=None):
                 self.node.setDriver(key, value, True, True)
     except ValueError: #A non number was passed 
         self.node.setDriver(key, 99, True, True, 25)
-        
+
+def command_ok(self, before_time, max_tries = 5):
+    loops = 0
+    while (self.last_update_time == before_time) and loops < max_tries:
+        time.sleep(0.5)
+        loops += loops
+    logging.debug(f'LAST UPDATE TIME {before_time} {self.last_update_time}')
+    return(loops < max_tries)        
 
 def mask2key (self, mask):
     logging.debug('mask2key : {}'.format(mask))

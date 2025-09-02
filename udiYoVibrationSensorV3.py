@@ -19,7 +19,7 @@ from yolinkVibrationSensorV2 import YoLinkVibrationSen
 
 
 class udiYoVibrationSensor(udi_interface.Node):
-    from  udiYolinkLib import my_setDriver, save_cmd_state, retrieve_cmd_state, prep_schedule, activate_schedule, update_schedule_data, node_queue, wait_for_node_done, mask2key
+    from  udiYolinkLib import my_setDriver, save_cmd_state, command_ok, retrieve_cmd_state, prep_schedule, activate_schedule, update_schedule_data, node_queue, wait_for_node_done, mask2key
 
     id = 'yovibrasens'
     
@@ -39,8 +39,9 @@ class udiYoVibrationSensor(udi_interface.Node):
             {'driver': 'GV2', 'value': 0, 'uom': 25},            
             {'driver': 'CLITEMP', 'value': 99, 'uom': 25},
             {'driver': 'ST', 'value': 0, 'uom': 25},    
-            {'driver': 'GV20', 'value': 99, 'uom': 25},
-             {'driver': 'TIME', 'value' :int(time.time()), 'uom': 151},                   
+            {'driver': 'GV29', 'value': 99, 'uom': 25},
+            {'driver': 'GV20', 'value': 99, 'uom': 25},   
+            {'driver': 'TIME', 'value' :int(time.time()), 'uom': 151},                   
             ]
 
 
@@ -73,7 +74,8 @@ class udiYoVibrationSensor(udi_interface.Node):
         self.temp_unit = self.yoAccess.get_temp_unit()
         self.adr_list = []
         self.adr_list.append(address)
-
+        self.my_setDriver('GV29', deviceInfo['access'])
+        self.last_update_time = 0
 
     def start(self):
         logging.info('start - udiYoVibrationSensor')
@@ -102,7 +104,8 @@ class udiYoVibrationSensor(udi_interface.Node):
 
     def updateData(self):
         if self.node is not None:
-            self.my_setDriver('TIME', self.yoVibrationSensor.getLastUpdateTime(), 151)
+            self.last_update_time = self.yoVibrationSensor.getLastUpdateTime_ms()
+            self.my_setDriver('TIME', int(self.last_update_time/1000), 151)
             if self.yoVibrationSensor.online:               
                 vib_state = self.getVibrationState()
                 if vib_state == 1:
@@ -153,9 +156,12 @@ class udiYoVibrationSensor(udi_interface.Node):
 
     def updateStatus(self, data):
         logging.info('updateStatus - udiYoLinkVibrationSensor')
+        before_time = self.last_update_time    
         self.yoVibrationSensor.updateStatus(data)
         self.updateData()
-
+        if not self.command_ok(before_time):
+            self.my_setDriver('GV20', 3)
+            
     def set_cmd(self, command):
         ctrl = int(command.get('value'))   
         logging.info('udiYoVibrationSensor  set_cmd - {}'.format(ctrl))

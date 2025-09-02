@@ -40,9 +40,7 @@ class YoLinkMQTTDevice(object):
         #yolink.callback = callback
         #yolink.build_device_api_request_data()
         #yolink.enable_device_api()
-        #{"deviceId": "d88b4c1603007966", "deviceUDID": "75addd8e21394d769b85bc292c553275", "name": "YoLink Hub", "token": "118347ae-d7dc-49da-976b-16fae28d8444", "type": "Hub"}
-        
-        yolinkDelaySupport = ['']
+
         yolink.yoAccess = yoAccess
         yolink.deviceInfo = deviceInfo
         #yolink.deviceId = yolink.deviceInfo['deviceId']
@@ -56,7 +54,7 @@ class YoLinkMQTTDevice(object):
         yolink.nbrPorts = 1
         yolink.nbrOutlets = 1
         yolink.nbrUsb = 0 
-        logging.debug('subscribe_mqtt: {}'.format(yolink.deviceInfo['deviceId']))
+        logging.debug('subscribe_mqtt: {}'.format(yolink.deviceInfo))
         yolink.yoAccess.subscribe_mqtt(deviceInfo['deviceId'], callback)
         yolink.lastDataPacket = ''
         yolink.lastControlPacket = '' 
@@ -476,6 +474,9 @@ class YoLinkMQTTDevice(object):
     def getLastUpdateTime(yolink):
         return(int(yolink.lastUpdate()/1000))
     
+    def getLastUpdateTime_ms(yolink):
+        return(int(yolink.lastUpdate()))
+
     
     def getTimeSinceUpdate(yolink):
         logging.debug('getTimeSinceUpdate')

@@ -21,7 +21,7 @@ from yolinkMotionSensorV2 import YoLinkMotionSens
 
 
 class udiYoMotionSensor(udi_interface.Node):
-    from  udiYolinkLib import my_setDriver, save_cmd_state, retrieve_cmd_state, prep_schedule, activate_schedule, update_schedule_data, node_queue, wait_for_node_done, mask2key
+    from  udiYolinkLib import my_setDriver, command_ok, save_cmd_state, retrieve_cmd_state, prep_schedule, activate_schedule, update_schedule_data, node_queue, wait_for_node_done, mask2key
 
     id = 'yomotionsens'
     
@@ -42,8 +42,9 @@ class udiYoMotionSensor(udi_interface.Node):
             {'driver': 'GV2', 'value': 0, 'uom': 25},      
             {'driver': 'CLITEMP', 'value': 99, 'uom': 25},
             {'driver': 'ST', 'value': 0, 'uom': 25},
+            {'driver': 'GV29', 'value': 99, 'uom': 25},
             {'driver': 'GV20', 'value': 99, 'uom': 25},
-             {'driver': 'TIME', 'value' :int(time.time()), 'uom': 151},
+            {'driver': 'TIME', 'value' :int(time.time()), 'uom': 151},
             ]
     
 
@@ -79,6 +80,8 @@ class udiYoMotionSensor(udi_interface.Node):
         self.temp_unit = self.yoAccess.get_temp_unit()
         self.adr_list = []
         self.adr_list.append(address)
+        self.my_setDriver('GV29', deviceInfo['access'])
+        self.last_update_time = 0
 
         
     def start(self):
@@ -121,7 +124,8 @@ class udiYoMotionSensor(udi_interface.Node):
 
     def updateData(self):
         if self.node is not None:
-            self.my_setDriver('TIME', self.yoMotionsSensor.getLastUpdateTime(), 151)
+            self.last_update_time = self.yoMotionsSensor.getLastUpdateTime_ms()
+            self.my_setDriver('TIME', int(self.last_update_time/1000), 151)
             if self.yoMotionsSensor.online:
                 logging.debug('Motion sensor CMD setting: {}'.format(self.cmd_state))
                 motion_state = self.getMotionState()
@@ -166,9 +170,13 @@ class udiYoMotionSensor(udi_interface.Node):
 
     def updateStatus(self, data):
         logging.info('updateStatus - udiYoLinkMotionSensor')
+        before_time = self.last_update_time   
         self.yoMotionsSensor.updateStatus(data)
         #time.sleep(1)
         self.updateData()
+        if not self.command_ok(before_time):
+            self.my_setDriver('GV20', 3)
+
 
     def set_cmd(self, command):
         ctrl = int(command.get('value'))   

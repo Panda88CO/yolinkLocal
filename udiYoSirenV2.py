@@ -19,7 +19,7 @@ from yolinkSirenV2 import YoLinkSir
 
 
 class udiYoSiren(udi_interface.Node):
-    from  udiYolinkLib import my_setDriver, save_cmd_state, retrieve_cmd_state, prep_schedule, activate_schedule, update_schedule_data, node_queue, wait_for_node_done, mask2key
+    from  udiYolinkLib import my_setDriver, save_cmd_state, command_ok, retrieve_cmd_state, prep_schedule, activate_schedule, update_schedule_data, node_queue, wait_for_node_done, mask2key
 
     id = 'yosiren'
     '''
@@ -66,7 +66,7 @@ class udiYoSiren(udi_interface.Node):
         self.node = self.poly.getNode(address)
         self.adr_list = []
         self.adr_list.append(address)
-
+        self.last_update_time = 0
 
     def start(self):
         logging.info('Start - udiYoSiren')
@@ -100,7 +100,8 @@ class udiYoSiren(udi_interface.Node):
 
     def updateData(self):
         if self.node is not None:
-            self.my_setDriver('TIME', self.yoSiren.getLastUpdateTime(), 151)
+            self.last_update_time = self.yoSiren.getLastUpdateTime_ms()
+            self.my_setDriver('TIME', int(self.last_update_time/1000), 151)
             state =  self.yoSiren.getState()
             if self.yoSiren.online:
                 logging.debug('Siren state {}'.format(state))
@@ -148,22 +149,26 @@ class udiYoSiren(udi_interface.Node):
 
     def sirenControl(self, command):
         logging.info('Siren Control')
+        before_time = self.last_update_time 
         state = int(command.get('value'))
         if state == 1:
             self.yoSiren.setState('on')
             self.sirenState = 1
-            self.node.setDriver('GV0',self.sirenState , True, True)
+            #self.node.setDriver('GV0',self.sirenState , True, True)
         else:
             self.yoSiren.setState('off')
             self.sirenState  = 0
-            self.node.setDriver('GV0', self.sirenState , True, True)
-
+            #self.node.setDriver('GV0', self.sirenState , True, True)
+        if not self.command_ok(before_time):
+            self.my_setDriver('GV20', 3)
 
 
     def update(self, command = None):
         logging.info('Update Status Executed')
+        before_time = self.last_update_time   
         self.yoSiren.refreshDevice()
-
+        if not self.command_ok(before_time):
+            self.my_setDriver('GV20', 3)
 
 
     commands = {

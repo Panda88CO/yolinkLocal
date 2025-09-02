@@ -21,7 +21,7 @@ from yolinkInfraredRemoterV2 import YoLinkInfraredRem
 
 
 class udiYoInfraredRemoter(udi_interface.Node):
-    from  udiYolinkLib import my_setDriver, save_cmd_state, retrieve_cmd_state, bool2ISY, prep_schedule, activate_schedule, update_schedule_data, node_queue, wait_for_node_done, mask2key
+    from  udiYolinkLib import my_setDriver, save_cmd_state, command_ok, retrieve_cmd_state, bool2ISY, prep_schedule, activate_schedule, update_schedule_data, node_queue, wait_for_node_done, mask2key
 
     id = 'yoirremote'
     '''
@@ -65,7 +65,8 @@ class udiYoInfraredRemoter(udi_interface.Node):
         self.wait_for_node_done()
         self.node = self.poly.getNode(address)
         self.adr_list = []
-        self.adr_list.append(address)        
+        self.adr_list.append(address)       
+        self.last_update_time = 0         
 
 
 
@@ -104,7 +105,8 @@ class udiYoInfraredRemoter(udi_interface.Node):
     def updateData(self):
         if self.node is not None:
             logging.debug('updateData - {}'.format(self.yoIRrem.online))
-            self.my_setDriver('TIME', self.yoIRrem.getLastUpdateTime(), 151)
+            self.last_update_time = self.yoIRrem.getLastUpdateTime_ms()
+            self.my_setDriver('TIME', int(self.last_update_time/1000), 151)
 
         if  self.yoIRrem.online:
             self.my_setDriver('ST', 1)
@@ -142,9 +144,11 @@ class udiYoInfraredRemoter(udi_interface.Node):
     
     def send_IRcode(self, command):
         logging.info('udiIRremote send_IRcode')
+        before_time = self.last_update_time        
         code = int(command.get('value'))
         self.yoIRrem.send_code(code)
-
+        if not self.command_ok(before_time):
+            self.my_setDriver('GV20', 3)
     '''
     def learn_IRcode(self, command):
         logging.info('udiIRremote learn_IRcode')
