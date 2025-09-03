@@ -173,7 +173,7 @@ class YoLinkInitLocal(object):
         if 'state' not in temp:
             self.local_token = temp
             self.local_token['expirationTime'] = int(self.local_token['expires_in'] + int(time.time()) )
-            logging.debug('Local yoAccess Token : {}'.format(self.token ))
+            logging.debug('Local yoAccess Token : {}'.format(self.local_token ))
         else:
             if temp['state'] != 'error':
                 logging.error('Authentication error')
